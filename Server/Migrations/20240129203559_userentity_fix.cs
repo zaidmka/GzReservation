@@ -13,6 +13,7 @@ namespace GzReservation.Server.Migrations
 
         }
 
+
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
