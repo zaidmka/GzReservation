@@ -1,0 +1,422 @@
+﻿@page "/admin/form/{formId:int}"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISecurityFormService SecurityFormService
+
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Form</PageTitle>
+<AuthorizeView>
+    <Authorized>
+
+
+        <div class="center-div">
+            <h2>قسم اصدار هويات المنطقة الخضراء</h2>
+            <h3>اللجنة الامنية</h3>
+        </div>
+        <div style="font-family:Cairo; font-size:18px;">
+
+            @if (form == null)
+            {
+                <div class="center-content">
+                    <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
+                    <h4 style="font-family:Cairo">
+                        الرجاء تسجيل
+                        <a href="login">الدخول  <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Info" Size="Size.Medium" /> </a>
+                        لغرض المحتوى
+                    </h4>
+                </div>
+            }
+            else
+            {
+
+                <div class="container">
+                    <div class="row">
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-outline-success" @onclick="fingerprint">
+                                التحقق من البصمة
+                                <div Class="rotate-on-hover">
+                                    <MudIcon Icon="@Icons.Material.Filled.Fingerprint" Color="Color.Inherit" Size="Size.Large" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- First Row -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="form_doc_no">رقم الحفظ</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.doc_no</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_doc_no">الاسم</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.name</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_doc_no">الرقم الوطني</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.id_number</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Second Row -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="form_entity">الجهة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.entity</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_father_work">عمل الأب</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.father_work</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_mother_name">اسم الأم</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.mother_name</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Third Row -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="form_mother_work">عمل الأم</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.mother_work</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_wife_name">اسم الزوجة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.wife_name</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_wife_work">عمل الزوجة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.wife_work</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Fourth Row -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="form_birthdate">تاريخ الولادة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.birthdate</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_study">الدراسة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.study</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_bagde_color">لون الباج</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.bagde_color</p>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    <!-- Fifth Row -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="form_reviewdate">تاريخ المقابلة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.review_date</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_info_book">رقم الكتاب</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.info_book</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_seq">تسلسل</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.seq</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Sixth Row -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="form_state">الحالة</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.state</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_nationalism">الجنسية</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.nationalism</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="form_religion">القومية</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.religion</p>
+                            </div>
+                        </div>
+
+                        <!-- Seventh Row -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="form_place_govern">محافظة الإقامة</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.place_govern</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="form_place_city">المدينة</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.place_city</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="form_place_point">اقرب نقطة دالة</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.place_point</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Eighth Row -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="form_place_mhala">المحلة</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.place_mhala</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="form_place_zuqaq">الزقاق</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.place_zuqaq</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="form_place_dar">الدار</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.place_dar</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ninth Row -->
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+                                <label for="form_work_place">مكان العمل</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.work_place</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="form_work_place2">مكان العمل السابق</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.work_place2</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="form_phone1">موبايل</label>
+                                <div class="form-control">
+                                    <p style="margin-bottom: 0px;">@form.phone1</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="form_a1">هل يوجد لديك احتجاز او توقيف لدى اي جهة امنية عراقية سابقاً؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a1</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="form_a2">هل تم اتهامك سابقاً او حالياً بأي شكوى قضائيا او في طور التحقيق؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a2</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a3">هل يوجد لديك حكم قضائي سابق؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a3</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a4">هل تم اعتقالك او احتجازك من قبل اي قوة عسكرية احنبية بعد سقوط النظام عام 2003؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a4</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a5">هل عملت ضمن الكيانات الامنية والحزبية المنحلة قبل عام 2003؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a5</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a6">هل لديك اقارب يعملون او يسكنون داخل المنطقة الخضراء؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a6</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a7">هل اجريت مقابلة ذات طابع امني لدى اي جهة اخرى ؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a7</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a8">هل سافرت خارج العراق؟ اذكر الدولة والسنة والغرض من السفر</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a8</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a9">اسماء الابناء البالغين مع ذكر التولد والعمل</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a9</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a10">اسماء الاخوة البالغين مع ذكر التولد والعمل</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a10</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a11">هل يوجد لدى افراد العائلة احتجاز او توقيف لدى اي جهة امنية عراقية سابقاً او حالياً؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a11</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a12">هل تم اتهام احد افراد العائلة سابقاً او حالياً بأي شكوى قضائيا او في طور التحقيق؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a12</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a13">هل يوجد لدى افراد العائلة حكم قضائي سابق او حالي؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a13</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a14">هل تم اعتقال احد افراد العائلة او احتجازه من قبل اي قوة عسكرية اجنبية بعد سقوط النظام عام 2003؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a14</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a15">هل احد افراد العائلة ضمن الكيانات الامنية والحزبية المنحلة قبل عام 2003؟ </label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a15</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a16">هل تسلم احد الاقارب مناصب حزبية او امنية مهمة قبل عام 2003؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a16</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_a17">هل تعرضت انت او احد افراد عائلتك او اقاربك الى عمل ارهابي؟</label>
+                            <div class="form-control">
+                                <p style="margin-bottom: 0px;">@form.a17</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+        <div class="center-content">
+            <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
+            <h4 style="font-family:Cairo">
+                الرجاء تسجيل
+                <a href="login">الدخول  <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Info" Size="Size.Medium" /> </a>
+                لغرض المحتوى
+            </h4>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    Form form = new Form();
+    [Parameter]
+    public int formId { get; set; }
+    string message = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await SecurityFormService.GetForm(formId);
+        if (response != null && response.Data != null)
+        {
+            form = response.Data;
+        }
+        else
+        {
+            message = response.Message;
+        }
+    }
+    public async void fingerprint()
+    {
+
+            // Use NavigationManager to generate the URL
+            var url = $"securityscanner://?key={form.did}";
+
+            // Create a JavaScript script to open the URL in a new window at maximum size
+            var script = @"
+        var screenWidth = screen.width;
+        var screenHeight = screen.height;
+        var windowFeatures = 'width=' + screenWidth + ',height=' + screenHeight + ',left=0,top=0';
+        window.open('" + url + "', 'myWindow', windowFeatures);";
+
+            // Use JavaScript Interop to execute the script
+            JSRuntime.InvokeVoidAsync("eval", script);
+       
+
+    }
+}

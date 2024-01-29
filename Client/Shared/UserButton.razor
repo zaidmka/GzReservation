@@ -1,0 +1,44 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using System.Security.Claims
+
+<MudMenu Label="@fullname" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Person" IconColor="Color.Primary" Size="Size.Large">
+
+    <AuthorizeView>
+        <Authorized>
+            <MudMenuItem>
+                <a href="profile"><MudIcon Icon="@Icons.Material.Rounded.Person" Color="Color.Warning" Size="Size.Medium" /> Profile</a>
+            </MudMenuItem>
+            <MudMenuItem>
+                <MudIcon Icon="@Icons.Material.Filled.MoveToInbox" Color="Color.Primary" Size="Size.Medium" /> Inbox
+            </MudMenuItem>
+            <MudMenuItem>
+                <button @onclick="Logout"> <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Secondary" Size="Size.Medium" /> Logout</button>
+            </MudMenuItem>
+        </Authorized>
+        <NotAuthorized>
+            <MudMenuItem>
+                <a href="login?returnUrl=@NavigationManager.ToBaseRelativePath(NavigationManager.Uri)"
+                <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Success" Size="Size.Medium" /> Login</a>
+            </MudMenuItem>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudMenu>
+@code {
+    string fullname = string.Empty;
+
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        NavigationManager.NavigateTo("", true);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        fullname = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+       
+    }
+}

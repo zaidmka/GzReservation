@@ -1,0 +1,546 @@
+﻿@page "/addform"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISecurityFormService SecurityFormService
+@inject IOracleService OracleService
+@inject HttpClient _http
+@implements IDisposable
+
+@using System.Security.Claims
+@using System.Net.Http.Headers
+
+<div style="font-family:Cairo;font-weight:700;">
+    @if (authrized)
+    {
+        @if (!string.IsNullOrEmpty(userMessage))
+        {
+            if (isSuccess)
+            {
+                <MudAlert Severity="Severity.Success">
+                    <a>تم خزن الاستمارة بنجاح</a>
+                    <a>no: @ddid</a>
+                </MudAlert>
+
+            }
+
+            else
+            {
+                <MudAlert Severity="Severity.Error">
+                    @userMessage
+                </MudAlert>
+            }
+        }
+        <button class="btn btn-outline-success" @onclick="fingerprint">
+            اخذ البصمات<MudIcon Icon="@Icons.Material.Filled.Fingerprint" Color="Color.Inherit" Size="Size.Large" />
+        </button>
+        @if (!fingerPrintState)
+        {
+            <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+        }
+        <p style="color:red">@message</p>
+
+        <h3 style="font-family:Cairo;">استمارة المقابلة الامنية</h3>
+
+
+        <EditForm Model="form" OnValidSubmit="AddForm">
+            <DataAnnotationsValidator />
+
+            <div class="container">
+                <!-- First Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_doc_no">رقم الحفظ</label>
+                        <InputNumber id="form_doc_no" @bind-Value="form.doc_no" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => form.doc_no)" />
+                        <button @onclick="LoadData" class="btn btn-danger" style="margin-top:4px;">تحميل من القاعدة</button>
+
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_name">الاسم</label>
+                        <InputText id="form_name" @bind-Value="form.name" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.name)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_id_number">رقم الهوية</label>
+                        <InputNumber id="form_id_number" @bind-Value="form.id_number" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => form.id_number)" />
+                    </div>
+
+                </div>
+
+                <!-- Second Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_entity">الجهة</label>
+                        <InputText id="form_entity" @bind-Value="form.entity" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.entity)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_father_work">عمل الأب</label>
+                        <InputText id="form_father_work" @bind-Value="form.father_work" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.father_work)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_mother_name">اسم الأم</label>
+                        <InputText id="form_mother_name" @bind-Value="form.mother_name" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.mother_name)" />
+                    </div>
+                </div>
+
+                <!-- Third Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_mother_work">عمل الأم</label>
+                        <InputText id="form_mother_work" @bind-Value="form.mother_work" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.mother_work)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_wife_name">اسم الزوجة</label>
+                        <InputText id="form_wife_name" @bind-Value="form.wife_name" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.wife_name)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_wife_work">عمل الزوجة</label>
+                        <InputText id="form_wife_work" @bind-Value="form.wife_work" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.wife_work)" />
+                    </div>
+
+                </div>
+
+                <!-- Fourth Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_birthdate">تاريخ الولادة</label>
+                        <InputDate id="form_birthdate" @bind-Value="form.birthdate" class="form-control" readonly></InputDate>
+                        <ValidationMessage For="@(() => form.birthdate)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_study">الدراسة</label>
+                        <InputText id="form_study" @bind-Value="form.study" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.study)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_bagde_color">تاريخ التخرج</label>
+                        <InputDate id="form_grad_year" @bind-Value="form.grad_year" class="form-control"></InputDate>
+                        <ValidationMessage For="@(() => form.grad_year)" />
+                    </div>
+
+
+
+                </div>
+
+                <!-- Fifth Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_reviewdate">تاريخ المقابلة</label>
+                        <InputDate id="form_reviewdate" @bind-Value="form.review_date" class="form-control"></InputDate>
+                        <ValidationMessage For="@(() => form.review_date)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_info_book">رقم الكتاب</label>
+                        <InputNumber id="form_info_book" @bind-Value="form.info_book" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => form.info_book)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_seq">تسلسل</label>
+                        <InputNumber id="form_seq" @bind-Value="form.seq" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => form.seq)" />
+                    </div>
+
+                </div>
+
+                <!-- Sixth Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_state">الحالة</label>
+                        <InputText id="form_state" @bind-Value="form.state" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.state)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_nationalism">الجنسية</label>
+                        <InputText id="form_nationalism" @bind-Value="form.nationalism" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.nationalism)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_religion">القومية</label>
+                        <InputText id="form_religion" @bind-Value="form.religion" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.religion)" />
+                    </div>
+                </div>
+
+                <!-- Seventh Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_place_govern">محافظة الإقامة</label>
+                        <InputText id="form_place_govern" @bind-Value="form.place_govern" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.place_govern)" />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="form_place_city">المدينة</label>
+                        <InputText id="form_place_city" @bind-Value="form.place_city" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.place_city)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_place_point">اقرب نقطة دالة</label>
+                        <InputText id="form_place_point" @bind-Value="form.place_point" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.place_point)" />
+                    </div>
+
+                </div>
+
+                <!-- Eighth Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_place_mhala">المحلة</label>
+                        <InputText id="form_place_mhala" @bind-Value="form.place_mhala" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.place_mhala)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_place_zuqaq">الزقاق</label>
+                        <InputText id="form_place_zuqaq" @bind-Value="form.place_zuqaq" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.place_zuqaq)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_place_dar">الدار</label>
+                        <InputText id="form_place_dar" @bind-Value="form.place_dar" class="form-control" readonly></InputText>
+                        <ValidationMessage For="@(() => form.place_dar)" />
+                    </div>
+                </div>
+
+                <!-- Ninth a Row -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="form_old_place">مكان الاقامة السابق</label>
+                        <InputText id="form_old_place" @bind-Value="form.old_place" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.old_place)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_bagde_color">لون الباج</label>
+                        <InputText id="form_bagde_color" @bind-Value="form.bagde_color" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.bagde_color)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_passport_no">رقم جواز السفر - ان وجد</label>
+                        <InputNumber id="form_passport_no" @bind-Value="form.passport_no" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => form.passport_no)" />
+                    </div>
+
+                </div>
+
+                <!-- Ninth b Row -->
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label for="form_work_place">مكان العمل</label>
+                        <InputText id="form_work_place" @bind-Value="form.work_place" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.work_place)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_work_place2">مكان العمل السابق</label>
+                        <InputText id="form_work_place2" @bind-Value="form.work_place2" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => form.work_place2)" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="form_phone1">موبايل</label>
+                        <InputNumber id="form_phone1" @bind-Value="form.phone1" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => form.phone1)" />
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="form_a1">هل يوجد لديك احتجاز او توقيف لدى اي جهة امنية عراقية سابقاً؟</label>
+                    <InputText id="form_a1" @bind-Value="form.a1" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a1)" />
+                </div>
+                <div class="mb-3">
+                    <label for="form_a2">هل تم اتهامك سابقاً او حالياً بأي شكوى قضائيا او في طور التحقيق؟</label>
+                    <InputText id="form_a2" @bind-Value="form.a2" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a2)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a3">هل يوجد لديك حكم قضائي سابق؟</label>
+                    <InputText id="form_a3" @bind-Value="form.a3" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a3)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a4">هل تم اعتقالك او احتجازك من قبل اي قوة عسكرية احنبية بعد سقوط النظام عام 2003؟</label>
+                    <InputText id="form_a4" @bind-Value="form.a4" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a4)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a5">هل عملت ضمن الكيانات الامنية والحزبية المنحلة قبل عام 2003؟</label>
+                    <InputText id="form_a5" @bind-Value="form.a5" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a5)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a6">هل لديك اقارب يعملون او يسكنون داخل المنطقة الخضراء؟</label>
+                    <InputText id="form_a6" @bind-Value="form.a6" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a6)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a7">هل اجريت مقابلة ذات طابع امني لدى اي جهة اخرى ؟</label>
+                    <InputText id="form_a7" @bind-Value="form.a7" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a7)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a8">هل سافرت خارج العراق؟ اذكر الدولة والسنة والغرض من السفر</label>
+                    <InputText id="form_a8" @bind-Value="form.a8" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a8)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a9">اسماء الابناء البالغين مع ذكر التولد والعمل</label>
+                    <InputText id="form_a9" @bind-Value="form.a9" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a9)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a10">اسماء الاخوة البالغين مع ذكر التولد والعمل</label>
+                    <InputText id="form_a10" @bind-Value="form.a10" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a10)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a11">هل يوجد لدى افراد العائلة احتجاز او توقيف لدى اي جهة امنية عراقية سابقاً او حالياً؟</label>
+                    <InputText id="form_a11" @bind-Value="form.a11" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a11)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a12">هل تم اتهام احد افراد العائلة سابقاً او حالياً بأي شكوى قضائيا او في طور التحقيق؟</label>
+                    <InputText id="form_a12" @bind-Value="form.a12" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a12)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a13">هل يوجد لدى افراد العائلة حكم قضائي سابق او حالي؟</label>
+                    <InputText id="form_a13" @bind-Value="form.a13" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a13)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a14">هل تم اعتقال احد افراد العائلة او احتجازه من قبل اي قوة عسكرية اجنبية بعد سقوط النظام عام 2003؟</label>
+                    <InputText id="form_a14" @bind-Value="form.a14" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a14)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a15">هل احد افراد العائلة ضمن الكيانات الامنية والحزبية المنحلة قبل عام 2003؟ </label>
+                    <InputText id="form_a15" @bind-Value="form.a15" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a15)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a16">هل تسلم احد الاقارب مناصب حزبية او امنية مهمة قبل عام 2003؟</label>
+                    <InputText id="form_a16" @bind-Value="form.a16" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a16)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="form_a17">هل تعرضت انت او احد افراد عائلتك او اقاربك الى عمل ارهابي؟</label>
+                    <InputText id="form_a17" @bind-Value="form.a17" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => form.a17)" />
+                </div>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary float-end">خزن الاستمارة</button>
+            <ValidationSummary />
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(userMessage))
+        {
+            if (isSuccess)
+            {
+                <MudAlert Severity="Severity.Success">
+                    <a>تم خزن الاستمارة بنجاح</a>
+                    <a>no: @ddid</a>
+                </MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Error">
+                    @userMessage
+                </MudAlert>
+            }
+        }
+    }
+    else
+    {
+        <div class="center-content">
+            <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
+            <h4 style="color:red;">
+                You Are Not Allowed To View THIS Page
+            </h4>
+        </div>
+    }
+
+</div>
+
+
+@code {
+    bool authrized = false;
+    private string UserName;
+    [Parameter]
+    public int Id { get; set; }
+    Form form = new Form();
+
+    //private Form form;
+    string btnText = "";
+    bool IsLoading = true;
+    bool deleted = false;
+    string msg = "Loading ...";
+    private bool DisableAddUpdateButon = false;
+    private string userMessage = "";
+    private bool isSuccess = false;
+    private int ddid;
+    private Form data;
+    //test1
+    private int zkey;
+    private bool fingerPrintState = true;
+    private string message;
+    protected override async Task OnInitializedAsync()
+    {
+        OracleService.OracleChange += StateHasChanged;
+        try
+        {
+            string role = (await AuthStateProvider.GetAuthenticationStateAsync()).
+            User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+
+            UserName = (await AuthStateProvider.GetAuthenticationStateAsync()).
+            User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+            form.username = UserName;
+            form.review_date = DateOnly.FromDateTime(DateTime.Today);
+            if (role.Contains("admin"))
+            {
+                authrized = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+        }
+    }
+    public void Dispose()
+    {
+        OracleService.OracleChange -= StateHasChanged;
+    }
+    async Task AddForm()
+    {
+        //form.actiondate = DateTime.UtcNow;
+
+        var result = await SecurityFormService.CreateForm(form);
+
+        // Update the UI based on the response
+        if (result.Success)
+        {
+            // Handle the success case
+            isSuccess = true;
+            userMessage = "تم الخزن بنجاح"; // Or use result.Message if it's more descriptive
+            ddid = result.Data.id;                                          // NavigationManager.NavigateTo($"admin/book/{result.Data.id}"); // Navigate or take other action as needed
+        }
+        else
+        {
+            // Handle the failure case
+            isSuccess = false;
+            userMessage = result.Message; // Display the error message from the service
+        }
+
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(form));
+        StateHasChanged();
+    }
+    async Task HandleFormSubmission()
+    {
+        var response = await SecurityFormService.CreateForm(form);
+
+    }
+    public async Task LoadData()
+    {
+        try
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<Form>>($"api/oracle/{form.doc_no}");
+            if (result != null && result.Data != null)
+            {
+                Console.WriteLine("Data retrieved successfully.");
+                Console.WriteLine("Entity: " + result.Data.entity);
+                Console.WriteLine("Name: " + result.Data.name);
+                // Log other relevant properties
+                form = result.Data;
+                form.username = UserName;
+                //form.phone1 = (0).ToString();
+                form.phone2 = (0).ToString();
+                form.review_date = DateOnly.FromDateTime(DateTime.Today);
+                //form.phone1 = null;
+                form.a1 = "لايوجد";
+                form.a2 = "لايوجد";
+                form.a3 = "لايوجد";
+                form.a4 = "لايوجد";
+                form.a5 = "لايوجد";
+                form.a6 = "لايوجد";
+                form.a7 = "لايوجد";
+                form.a8 = "لايوجد";
+                form.a9 = "لايوجد";
+                form.a10 = "لايوجد";
+                form.a11 = "لايوجد";
+                form.a12 = "لايوجد";
+                form.a13 = "لايوجد";
+                form.a14 = "لايوجد";
+                form.a15 = "لايوجد";
+                form.a16 = "لايوجد";
+                form.a17 = "لايوجد";
+
+
+
+            }
+            else
+            {
+                Console.WriteLine("Result or Data is null.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+        }
+    }
+    public async void fingerprint()
+    {
+        fingerPrintState = false;
+
+        var response = await SecurityFormService.GetForm(ddid);
+        if(response !=null && response.Data != null)
+        {
+            zkey = response.Data.did;
+            fingerPrintState = true;
+            // Use NavigationManager to generate the URL
+            var url = $"securityscanner://?key={zkey}";
+
+            // Create a JavaScript script to open the URL in a new window at maximum size
+            var script = @"
+        var screenWidth = screen.width;
+        var screenHeight = screen.height;
+        var windowFeatures = 'width=' + screenWidth + ',height=' + screenHeight + ',left=0,top=0';
+        window.open('" + url + "', 'myWindow', windowFeatures);";
+
+            // Use JavaScript Interop to execute the script
+            JSRuntime.InvokeVoidAsync("eval", script);
+        }
+        else
+        {
+            message = response.Message;
+            StateHasChanged();
+        }
+
+    }
+
+}

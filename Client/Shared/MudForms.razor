@@ -1,0 +1,90 @@
+﻿@inject ISecurityFormService SecurityFormService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+@if (SecurityFormService.Forms == null)
+{
+    <div class="spinner-grow" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else
+{
+    <div style="font-family: 'Cairo', sans-serif; height:100%;">
+        <MudDataGrid Items="@SecurityFormService.Forms" RowsPerPage="10"
+                     Virtualize="true" FixedHeader="true"
+                     ColumnResizeMode="ResizeMode.Column"
+                     Hover="true" LoadingProgressColor="Color.Warning" Bordered="true">
+
+            <Columns>
+                <PropertyColumn Property="x => x.id" Title="ID" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" style="color:red" />
+                <PropertyColumn Property="x => x.did" Title="ZKEY" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" />
+                <PropertyColumn Property="x => x.doc_no" Title="رقم الحفظ" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" />
+                <PropertyColumn Property="x => x.name" Title="الاسم" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" />
+                <PropertyColumn Property="x => x.entity" Title="الجهة" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" />
+                <PropertyColumn Property="x => x.bagde_color" Title="اللون" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" />
+                <PropertyColumn Property="x => x.review_date" Format="dd/MM/yyyy" Title="تاريخ المقابلة" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;" />
+
+
+
+                <TemplateColumn Title="عرض الاستمارة" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;">
+                    <CellTemplate>
+                        <MudIconButton Color="@Color.Primary" Icon="@Icons.Material.Outlined.Edit" OnClick="() => EditBook(context.Item.id)" />
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="PDF" HeaderStyle="background-color: #B0C4DE;color:#2F4F4F;font-size:16px; text-align: center;font-weight: bold;">
+                    <CellTemplate>
+                        <MudIconButton Color="@Color.Error" Icon="@Icons.Material.Filled.OpenInNew" OnClick="() => HandleButtonClick(context.Item.id)" />
+
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager PageSizeOptions=@(new int[] {5, 10, 20}) />
+            </PagerContent>
+        </MudDataGrid>
+
+    </div>
+}
+@code {
+    //  bool IsLoading;
+    private bool _resizeColumn;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //await SecurityFormService.GetForms();
+        SecurityFormService.FormChange += StateHasChanged;
+        // IsLoading = true;
+
+        //  await BookService.GetAdminBook(); // Data fetching method
+
+        // IsLoading = false; // This change ensures that IsLoading is set to false only after data fetching is complete.
+    }
+    public void Dispose()
+    {
+        SecurityFormService.FormChange -= StateHasChanged;
+    }
+
+    void EditBook(int formId)
+    {
+        NavigationManager.NavigateTo($"admin/form/{formId}");
+
+    }
+
+    void HandleButtonClick(int formId)
+    {
+        // Use NavigationManager to generate the URL
+        var url = NavigationManager.ToAbsoluteUri($"/forms/{formId}");
+
+        // Create a JavaScript script to open the URL in a new window at maximum size
+        var script = @"
+        var screenWidth = screen.width;
+        var screenHeight = screen.height;
+        var windowFeatures = 'width=' + screenWidth + ',height=' + screenHeight + ',left=0,top=0';
+        window.open('" + url + "', 'myWindow', windowFeatures);";
+
+        // Use JavaScript Interop to execute the script
+        JSRuntime.InvokeVoidAsync("eval", script);
+    }
+
+}

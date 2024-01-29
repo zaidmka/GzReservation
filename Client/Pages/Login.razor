@@ -1,0 +1,76 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.WebUtilities
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Login</PageTitle>
+@if (!check)
+{
+    <MudAlert Severity="Severity.Error">
+        @errorMessage
+    </MudAlert>
+}
+<div class="d-flex justify-content-center">
+    <img src="/logomedium.png" style="width:200px;" />
+</div>
+<div style="font-family:Cairo;" class="d-flex justify-content-center">
+    <h3>تسجيل الدخول</h3>
+</div>
+<EditForm Model="user" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <div style="font-family:Cairo;font-weight:bold;font-size:16px; min-height: 100vh;" class="d-flex justify-content-center">
+        <div class="col-md-4 mb-3">
+
+            <label for="email">الحساب</label>
+            <InputText id="email" @bind-Value="user.Email" class="form-control" />
+            <ValidationMessage For="@(() => user.Email)" />
+
+            <label for="password">كلمة المرور</label>
+            <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
+            <ValidationMessage For="@(() => user.Password)" />
+
+            <button style="margin-top:4px;" type="submit" class="btn btn-primary">الدخول</button>
+        </div>
+
+    </div>
+</EditForm>
+
+
+@code {
+    private UserLogin user = new UserLogin();
+
+    private string errorMessage = string.Empty;
+
+    private string returnUrl = string.Empty;
+    bool check = true;
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
+        {
+            returnUrl = url;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        var result = await AuthService.Login(user);
+        if (result.Success)
+        {
+            errorMessage = string.Empty;
+
+            await LocalStorage.SetItemAsync("authToken", result.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateTo(returnUrl, true);
+            check = true;
+        }
+        else
+        {
+            errorMessage = result.Message;
+            check = false;
+        }
+    }
+}

@@ -1,0 +1,56 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page" style="font-family:Cairo">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+   @*  <MudDrawerContainer Class="mud-height-full">
+        <MudDrawer @bind-Open="@open" Anchor="Anchor.End" 
+                   Variant="@DrawerVariant.Persistent" Color="Color.Primary" @onmouseleave="CloseDrawer">
+            <div class="d-flex justify-content-center" style="margin-top:20px; margin-bottom:20px;">
+                <img class="fade-in-out" src="https://upload.wikimedia.org/wikipedia/commons/b/bf/Coat_of_arms_of_Iraq.svg" width="70" height="70" alt="Menu Icon" />
+            </div>
+
+            <h4>GBZD/ اللجنة الامنية</h4>
+
+            <button><i href="/">test1</i></button>
+            <i>test1</i>
+            <i>test1</i>
+        </MudDrawer>
+    </MudDrawerContainer> *@
+
+    <main>
+        <div class="top-row px-4">
+            <div class="col-5">
+                <button @onclick=ToggleDrawer>
+                    <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="40" height="40" alt="Menu Icon" />
+                </button>
+            </div>
+            <div class="col-5">
+                <Search />
+            </div>
+            <div class="col-2"><UserButton /></div>
+        </div>
+
+        <article class="content px-4" style="background-color:#F8F8FF;">
+            @Body
+        </article>
+    </main>
+</div>
+@code
+{
+    private MudTheme Theme = new MudTheme();
+    bool open = false;
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+    void CloseDrawer()
+    {
+        open = false; // This will close the drawer when the mouse leaves
+    }
+}
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />

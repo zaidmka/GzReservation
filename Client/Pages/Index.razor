@@ -1,0 +1,151 @@
+﻿@page "/"
+@page "/Search/{searchText}"
+@page "/forms/{formId}"
+@using System.Security.Claims
+@using iText.Forms;
+@using iText.Kernel.Font
+@using iText.Kernel.Pdf;
+@using iTextSharp.text;
+@using System.IO;
+@using QRCoder;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISecurityFormService SecurityFormService
+
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Index</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <div style="font-family:Cairo; height:1000px;">
+
+            @if (searchText == null && formId == null)
+            {
+                <div class="center-div">
+                    <h2>قسم اصدار هويات المنطقة الخضراء</h2>
+                    <h3>اللجنة الامنية</h3>
+                </div>
+                <div class="center-content">
+                    <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="400" height="400" alt="Menu Icon" />
+                    <h4 style="font-family:Cairo">
+                        اهلا وسهلا سيد (@fullname) في النظام
+                    </h4>
+                </div>
+
+            }
+            else if(formId != null)
+            {
+
+
+
+
+                @if (!string.IsNullOrEmpty(pdfBase64))
+                {
+                    <iframe src="data:application/pdf;base64,@pdfBase64"></iframe>
+                }
+                else
+                {
+                    <div class="center-content">
+                        <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" /><br />
+                        <button @onclick="FetchAndFillPdf" class="btn btn-outline-secondary">
+                            فتح ملف <MudIcon Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" Size="Size.Large" />
+                        </button>
+                        <h4 style="font-family:Cairo" hidden="@state">جاري تحميل الملف
+                        </h4>
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" hidden="@state"/>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <MudForms />
+
+            }
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+        <div class="center-content">
+            <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
+            <h4 style="font-family:Cairo">
+                الرجاء تسجيل
+                <a href="login">الدخول  <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Info" Size="Size.Medium" /> </a>
+                لغرض المحتوى
+            </h4>
+            <h4 style="font-family:Cairo;color:red">
+                النظام خاص بقسم اصدار هويات دخول المنطقة الخضراء, يمسح بالدخول للاشخاص المخولين فقط
+            </h4>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [Parameter]
+    public string formId { get; set; }
+    [Parameter]
+    public string? searchText { get; set; } = null;
+    private string pdfBase64;
+    private bool state = true;
+    public string message = "";
+    string fullname = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (searchText != null)
+        {
+            await SecurityFormService.searchForms(searchText);
+        }
+    }
+    private async Task FetchAndFillPdf()
+    {
+        if (formId != null)
+        {
+            state = false;
+            try
+            {
+                var pdfBytes = await Http.GetByteArrayAsync($"/Form/{formId}");
+
+                if (pdfBytes == null || pdfBytes.Length == 0)
+                {
+                    Console.WriteLine("Fetched PDF is empty or null.");
+                    return;
+                }
+
+                // Fill the first three form fields
+                //pdfBytes = FillPdfFormFields(pdfBytes);
+
+                if (pdfBytes == null || pdfBytes.Length == 0)
+                {
+                    Console.WriteLine("Filled PDF is empty or null.");
+                    return;
+                }
+                // pdfBytes = FillPdfFormFieldsWithQRCode(pdfBytes);
+
+                if (pdfBytes == null || pdfBytes.Length == 0)
+                {
+                    Console.WriteLine("QR Code PDF is empty or null.");
+                    return;
+                }
+
+                pdfBase64 = Convert.ToBase64String(pdfBytes);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching and filling PDF: {ex.Message}");
+            }
+        }
+        else
+        {
+
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        fullname = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+    }
+
+
+
+
+}

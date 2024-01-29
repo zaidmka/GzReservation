@@ -1,0 +1,36 @@
+﻿
+using GzReservation.Client.Pages;
+using System.Net.Http.Json;
+using System.Text.Json;
+
+namespace GzReservation.Client.Services.OracleService
+{
+    public class OracleService : IOracleService
+    {
+        private readonly HttpClient _http;
+
+        public OracleService(HttpClient http)
+        {
+            _http = http;
+        }
+
+        public Form OracleData { get; set; }
+
+        public event Action OracleChange;
+
+        public async Task GetDataAsync(int docNo)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<Form>>($"api/oracle/{docNo}");
+            if (result != null && result.Data != null)
+            {
+                OracleData = result.Data;
+                OracleChange?.Invoke(); // If you want to notify subscribers about the change
+            }
+            else
+            {
+                // Handle the case where result or result.Data is null
+                OracleData = null;
+            }
+        }
+    }
+}
