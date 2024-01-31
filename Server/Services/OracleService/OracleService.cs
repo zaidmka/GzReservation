@@ -113,7 +113,11 @@ namespace GzReservation.Server.Services.OracleService
                         cmd.BindByName = true;
 
                         // Replace with your actual SQL query
-                        cmd.CommandText = "SELECT ZONE_NUMBER, TOWN, STREET_NO, PRIVATE_PHONE_NO, OFFICE_PHONE_NO, NATIONALITY_NAME, NATIONALISM_NAME, NAME1, MOTHER_NAME, MARITAL_STATUS, ID_NUMBER, HOUSE_NO, GOVERNORATE, ENTITY_NAME, DOC_NO, DATE_OF_BIRTH, BAR_CODE, BADGE_COLOUR FROM APPL_VIEWB WHERE DOC_NO=" + entityCode + "";
+                        cmd.CommandText = "SELECT DOC_NO, NAME, ENTITY_CODE,MOTHER_NAME FROM APPL_VIEWBZ WHERE ENTITY_CODE = :EntityCode AND ROWNUM <= 30 and TRANSACTION_DATE > to_date('15/06/2023','dd/MM/yyyy') and TRANSACTION_TYPE like :trans and TRANSACTION_TYPE not like :trans1 order by DOC_NO";
+                        cmd.Parameters.Add("EntityCode", OracleDbType.Varchar2).Value = entityCode;
+                        cmd.Parameters.Add("trans", OracleDbType.Varchar2).Value = "مقابلة امنية";
+                        cmd.Parameters.Add("trans1", OracleDbType.Varchar2).Value = "اجتياز مقابلة";
+
                         using (DbDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync()) // Loop through all the records
@@ -121,8 +125,10 @@ namespace GzReservation.Server.Services.OracleService
                                 var preReservation = new PreReservation
                                 {
                                     // Assuming you have properties like these in your PreReservation model
-                                    full_name = reader["ZONE_NUMBER"].ToString(),
-                                    mother_name = reader["TOWN"].ToString(),
+                                    full_name = reader["NAME"].ToString(),
+                                    mother_name = reader["MOTHER_NAME"].ToString(),
+                                    doc_no = Convert.ToInt32(reader["DOC_NO"]),
+                                    EntityId = Convert.ToInt32(reader["ENTITY_CODE"]),
 
                                 };
 
