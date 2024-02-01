@@ -113,7 +113,7 @@ namespace GzReservation.Server.Services.OracleService
                         cmd.BindByName = true;
 
                         // Replace with your actual SQL query
-                        cmd.CommandText = "SELECT DOC_NO, NAME, ENTITY_CODE,MOTHER_NAME FROM APPL_VIEWBZ WHERE ENTITY_CODE = :EntityCode AND ROWNUM <= 30 and TRANSACTION_DATE > to_date('15/06/2023','dd/MM/yyyy') and TRANSACTION_TYPE like :trans and TRANSACTION_TYPE not like :trans1 order by DOC_NO";
+                        cmd.CommandText = "SELECT DOC_NO, NAME, ENTITY_CODE,MOTHER_NAME FROM APPL_VIEWBZ WHERE ENTITY_CODE = :EntityCode and TRANSACTION_DATE > to_date('15/06/2023','dd/MM/yyyy') and TRANSACTION_TYPE like :trans and bar_code not in (select bar_code from appl_viewbz where transaction_type like :trans1)  order by DOC_NO";
                         cmd.Parameters.Add("EntityCode", OracleDbType.Varchar2).Value = entityCode;
                         cmd.Parameters.Add("trans", OracleDbType.Varchar2).Value = "مقابلة امنية";
                         cmd.Parameters.Add("trans1", OracleDbType.Varchar2).Value = "اجتياز مقابلة";
