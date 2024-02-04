@@ -93,7 +93,7 @@ namespace GzReservation.Server.Services.ReservationService
                         return new ServiceResponse<Reservation>
                         {
                             Data = null,
-                            Message = "Doc no is already in reservation list for the next week.",
+                            Message = "القيد موجود في حجز الاسبوع القادم",
                             Success = false
                         };
                     }
@@ -134,7 +134,7 @@ namespace GzReservation.Server.Services.ReservationService
                         return new ServiceResponse<Reservation>
                         {
                             Data = newReservation,
-                            Message = "Reservation added successfully.",
+                            Message = "تم الحجز بنجاح",
                             Success = true
                         };
                     }
