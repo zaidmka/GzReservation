@@ -23,12 +23,16 @@
             {
                 <div class="center-div">
                     <h2>قسم اصدار هويات المنطقة الخضراء</h2>
-                    <h3>اللجنة الامنية</h3>
+                    <h2>اللجنة الامنية</h2>
+                    <h3>نظام الحجز الالكتروني للمقابلات الامنية</h3>
                 </div>
                 <div class="center-content">
                     <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="400" height="400" alt="Menu Icon" />
                     <h4 style="font-family:Cairo">
                         اهلا وسهلا سيد (@fullname) في النظام
+                    </h4>
+                    <h4 style="font-family:Cairo">
+                        مخول (@entityName)
                     </h4>
                 </div>
 
@@ -88,6 +92,7 @@
     private bool state = true;
     public string message = "";
     string fullname = string.Empty;
+    string entityName = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -143,6 +148,8 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         fullname = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        entityName = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+
     }
 
 

@@ -1,6 +1,7 @@
 ﻿
 using GzReservation.Client.Pages;
 using System.Net.Http.Json;
+using System.Net.Sockets;
 using System.Text.Json;
 
 namespace GzReservation.Client.Services.OracleService
@@ -15,6 +16,7 @@ namespace GzReservation.Client.Services.OracleService
         }
 
         public Form OracleData { get; set; }
+        public List<PreReservation> ValidRecords { get; set; }
 
         public event Action OracleChange;
 
@@ -32,5 +34,12 @@ namespace GzReservation.Client.Services.OracleService
                 OracleData = null;
             }
         }
+
+        public async Task<ServiceResponse<List<PreReservation>>> GetPreValidRecords(int entityId, string secret)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<PreReservation>>>($"api/test/{entityId}/{secret}");
+            return result;
+        }
+
     }
 }

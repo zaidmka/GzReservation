@@ -57,7 +57,9 @@ namespace GzReservation.Server.Services.AuthService
         {
             var response = new ServiceResponse<string>();
             var user = await _context.usersentity
-                .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+                .Include(e => e.Entity)
+                .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()))
+                ;
             if (user == null)
             {
                 response.Success = false;
@@ -133,7 +135,8 @@ namespace GzReservation.Server.Services.AuthService
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim(ClaimTypes.Email, user.fullname)
+                new Claim(ClaimTypes.Email, user.fullname),
+                new Claim(ClaimTypes.GivenName, user.Entity.entity_name)
 
             };
 

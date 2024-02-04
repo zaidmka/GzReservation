@@ -31,5 +31,12 @@ namespace GzReservation.Server.Controllers
             var result = await _reservationService.GetFreeSpotsByEntity(entityId);
             return Ok(result);
         }
+        [HttpGet("reservations/{entityId}")]
+        public async Task<ActionResult<ServiceResponse<List<Reservation>>>>GetReservationsByEntity(int entityId)
+        {
+            var result = await _reservationService.GetReservationByEntity(entityId);
+            return Ok(result);
+        }
+
     }
 }

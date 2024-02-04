@@ -12,6 +12,7 @@ namespace GzReservation.Server.Services.ReservationService
         Task<ServiceResponse<List<Reservation>>> SearchReservation(string searchText);
         Task<ServiceResponse<List<int>>> GetFreeSpots();
         Task<ServiceResponse<List<int>>> GetFreeSpotsByEntity(int entityId);
+        Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId);
 
     }
 }

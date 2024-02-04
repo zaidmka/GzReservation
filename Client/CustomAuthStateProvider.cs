@@ -1,25 +1,24 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.JSInterop;
 
 namespace GzReservation.Client
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
-        private readonly ILocalStorageService _localStorageService;
+        private readonly IJSRuntime _jsRuntime;
         private readonly HttpClient _http;
 
-        public CustomAuthStateProvider(ILocalStorageService localStorageService, HttpClient http)
+        public CustomAuthStateProvider(IJSRuntime jsRuntime, HttpClient http)
         {
-            _localStorageService = localStorageService;
+            _jsRuntime = jsRuntime;
             _http = http;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            string authToken = await _localStorageService.GetItemAsStringAsync("authToken");
+            string authToken = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "authToken");
 
             var identity = new ClaimsIdentity();
             _http.DefaultRequestHeaders.Authorization = null;
@@ -34,7 +33,7 @@ namespace GzReservation.Client
                 }
                 catch
                 {
-                    await _localStorageService.RemoveItemAsync("authToken");
+                    await _jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "authToken");
                     identity = new ClaimsIdentity();
                 }
             }

@@ -1,0 +1,185 @@
+﻿@inject IOracleService OracleService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient httpClient
+<h3>حجز الموعد</h3>
+<hr />
+<div class="dropstart" style="font-family: 'Cairo', sans-serif;width:550px; margin-left:15px;">
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <MudTextField @bind-Value="entityId" Label="رمز الجهة" Variant="Variant.Outlined" Style="flex-grow: 1;" Margin="Margin.Dense"></MudTextField>
+        <MudTextField @bind-Value="secret" Label="باسورد الجهة" Variant="Variant.Outlined" Style="flex-grow: 1;" Margin="Margin.Dense"></MudTextField>
+        <button disabled="@IsButtonDisabled" @onclick="LoadData" type="button" class="btn btn-outline-primary" style="flex-shrink: 0;">
+            @if (_processing)
+            {
+                <MudProgressCircular Color="Color.Secondary" Indeterminate="true" Size="Size.Small" />
+                <span>جاري التحميل</span>
+            }
+            else
+            {
+                <MudIcon Icon=@Icons.Material.Filled.PersonSearch />
+                <span>عرض الاسماء</span>
+            }
+        </button>
+    </div>
+
+
+</div>
+@if (!state)
+{
+
+}
+else
+{
+    <div style="font-weight:600;font-size:16px;">
+        <h4>القيد المختار</h4>
+        <span>الاسم: @name</span>
+        <br />
+        <span>رقم الحفظ: @docNo</span>
+        <br />
+        <span>رمز الجهة: @entity</span>
+        <br />
+        <span>التاريخ المختار: @(selectedDay?.ToString("dd/MM/yyyy"))</span><br /><hr />
+        @foreach (var day in activeDays)
+        {
+            <button type="button"
+                    class="btn @(selectedDay == day ? "btn-primary" : "btn-outline-primary") m-1"
+                    @onclick="() => SelectDay(day)">
+                @day.DayOfWeek - @day.ToString("yyyy-MM-dd")
+            </button>
+        }
+    </div>
+
+    <hr />
+    <MudTable T="PreReservation" Items="@ValidDbaRecords" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+              RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader">
+        <HeaderContent>
+            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">التسلسل</MudTh>
+
+            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">الاسم الكامل</MudTh>
+            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">اسم الأم</MudTh>
+            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رقم الحفظ</MudTh>
+            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رمز الجهة</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nr">@(ValidDbaRecords.IndexOf(context) + 1)</MudTd>
+
+            <MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
+                <MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
+                <MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
+                <MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
+            </RowTemplate>
+        </MudTable>
+
+
+}
+
+@code {
+    int entityId;
+    string secret = string.Empty;
+    bool state = false;
+    private bool _processing = false;
+    string message = string.Empty;
+    private List<PreReservation> ValidDbaRecords = new List<PreReservation>();
+    private int selectedRowNumber = -1;
+    private MudTable<PreReservation> mudTable;
+    private string name = string.Empty;
+    private string motherName = string.Empty;
+    private int docNo;
+    private int entity;
+    private List<DateTime> activeDays = new List<DateTime>();
+    private DateTime? selectedDay;
+    private void RowClickEvent(TableRowClickEventArgs<PreReservation> tableRowClickEventArgs)
+    {
+        name = tableRowClickEventArgs.Item.full_name;
+        docNo = tableRowClickEventArgs.Item.doc_no;
+        entity = tableRowClickEventArgs.Item.EntityId;
+        motherName = tableRowClickEventArgs.Item.mother_name;
+    }
+
+    private string SelectedRowClassFunc(PreReservation element, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+            name = element.full_name;
+            motherName = element.mother_name;
+            docNo = element.doc_no;
+            entity = element.EntityId;
+            //StateHasChanged();
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+
+
+
+
+
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var today = DateTime.Today;
+        var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
+        for (int i = 0; i < 5; i++) // Sunday to Thursday
+        {
+            activeDays.Add(nextSunday.AddDays(i));
+        }
+    }
+    void SelectDay(DateTime day)
+    {
+        selectedDay = day;
+    }
+    bool IsButtonDisabled => string.IsNullOrWhiteSpace(secret) || entityId <= 0 || _processing;
+
+    async Task LoadData()
+    {
+        _processing = true;
+        state = false;
+        var result = await OracleService.GetPreValidRecords(entityId, secret);
+        if (result != null && result.Success)
+        {
+
+            message = result.Message;
+            state = true;
+            _processing = false;
+            ValidDbaRecords = result.Data;
+        }
+        await Task.Delay(1000);
+
+        StateHasChanged();
+    }
+
+
+
+}
+<style>
+    .selected {
+        background-color: thistle !important;
+    }
+
+        .selected > td {
+            color: white !important;
+        }
+
+            .selected > td .mud-input {
+                color: white !important;
+            }
+
+    .testheader {
+        background-color: rebeccapurple;
+    }
+
+</style>

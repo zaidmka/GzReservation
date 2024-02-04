@@ -4,6 +4,7 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Login</PageTitle>
 @if (!check)
@@ -62,7 +63,9 @@
         {
             errorMessage = string.Empty;
 
-            await LocalStorage.SetItemAsync("authToken", result.Data);
+            // Store token in sessionStorage instead of localStorage
+            await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "authToken", result.Data);
+
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
             NavigationManager.NavigateTo(returnUrl, true);
             check = true;
