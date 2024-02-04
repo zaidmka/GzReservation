@@ -1,4 +1,4 @@
-﻿namespace GzReservation.Server.DTOs
+﻿namespace GzReservation.Client.DTOs
 {
     public record struct ReservationDto
 (

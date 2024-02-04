@@ -6,6 +6,7 @@ global using Microsoft.AspNetCore.Components.Authorization;
 global using Blazored.LocalStorage;
 global using GzReservation.Client.Services.OracleService;
 global using GzReservation.Client.Services.ReservationService;
+global using GzReservation.Client.DTOs;
 
 using GzReservation.Client;
 using Microsoft.AspNetCore.Components.Web;

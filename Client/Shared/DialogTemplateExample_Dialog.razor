@@ -1,0 +1,29 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText Style="font-family:Cairo;font-size:16px;">@ContentText</MudText>
+            <MudText Style="font-family:Cairo;font-size:16px;">@ContentText1</MudText>
+            <MudText Style="font-family:Cairo;font-size:16px;">@ContentText2</MudText>
+
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton Style="font-family:Cairo;font-size:16px;" Color="@Color" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+        </DialogActions>
+    </MudDialog>
+
+
+    @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string ContentText { get; set; }
+    [Parameter] public string ContentText1 { get; set; }
+    [Parameter] public string ContentText2 { get; set; }
+
+
+    [Parameter] public string ButtonText { get; set; }
+
+    [Parameter] public Color Color { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

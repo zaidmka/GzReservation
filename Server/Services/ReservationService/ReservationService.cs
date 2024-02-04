@@ -84,7 +84,19 @@ namespace GzReservation.Server.Services.ReservationService
                             Success = false
                         };
                     }
-
+                    //check the doc_no is not repeated for the next week reservation
+                    int DocNoCount = await _dataContext.reservations
+                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly &&r.doc_no ==reservationDto.doc_no)
+                        .CountAsync();
+                    if(DocNoCount >= 1)
+                    {
+                        return new ServiceResponse<Reservation>
+                        {
+                            Data = null,
+                            Message = "Doc no is already in reservation list for the next week.",
+                            Success = false
+                        };
+                    }
                     // Retrieve the count of reservations for the same EntityId for the next active week
                     int reservationsCountForWeek = await _dataContext.reservations
                         .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly)
@@ -111,7 +123,9 @@ namespace GzReservation.Server.Services.ReservationService
                             EntityId = reservationDto.EntityId,
                             full_name = reservationDto.full_name,
                             mother_name = reservationDto.mother_name,
-                            reservation_date = reservationDto.reservation_date
+                            reservation_date = reservationDto.reservation_date,
+                            state = reservationDto.state,
+                            uuser = reservationDto.uuser
                         };
 
                         _dataContext.reservations.Add(newReservation);
