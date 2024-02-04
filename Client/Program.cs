@@ -5,13 +5,12 @@ global using GzReservation.Client.Services.AuthService;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Blazored.LocalStorage;
 global using GzReservation.Client.Services.OracleService;
-global using System.Globalization;
+global using GzReservation.Client.Services.ReservationService;
 
 using GzReservation.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using GzReservation.Client;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -22,6 +21,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<ISecurityFormService, SecurityFormService>();
 builder.Services.AddScoped<IOracleService, OracleService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 

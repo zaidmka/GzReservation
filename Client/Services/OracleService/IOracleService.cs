@@ -6,6 +6,6 @@
         Form OracleData { get; set; }
         Task GetDataAsync(int docNo);
 
-        Task<ServiceResponse<List<PreReservation>>> GetPreValidRecords(int entityId,string secret);
+        Task<ServiceResponse<List<PreReservation>>> GetPreValidRecords(int entityId);
     }
 }

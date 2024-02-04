@@ -2,184 +2,269 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject HttpClient httpClient
-<h3>حجز الموعد</h3>
-<hr />
-<div class="dropstart" style="font-family: 'Cairo', sans-serif;width:550px; margin-left:15px;">
-
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <MudTextField @bind-Value="entityId" Label="رمز الجهة" Variant="Variant.Outlined" Style="flex-grow: 1;" Margin="Margin.Dense"></MudTextField>
-        <MudTextField @bind-Value="secret" Label="باسورد الجهة" Variant="Variant.Outlined" Style="flex-grow: 1;" Margin="Margin.Dense"></MudTextField>
-        <button disabled="@IsButtonDisabled" @onclick="LoadData" type="button" class="btn btn-outline-primary" style="flex-shrink: 0;">
-            @if (_processing)
-            {
-                <MudProgressCircular Color="Color.Secondary" Indeterminate="true" Size="Size.Small" />
-                <span>جاري التحميل</span>
-            }
-            else
-            {
-                <MudIcon Icon=@Icons.Material.Filled.PersonSearch />
-                <span>عرض الاسماء</span>
-            }
-        </button>
-    </div>
-
-
+@inject ISecurityFormService SecurityFormService
+@inject IReservationService ReservationService
+@using System.Security.Claims
+  
+<div class="center-div">
+	<h3>حجز الموعد</h3>
 </div>
 @if (!state)
 {
+	<div class="center-content">
+		<img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" /><br />
+		<h4 style="font-family:Cairo">
+			جاري تحميل القيود
+		</h4>
+		<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+
+	</div>
+
 
 }
 else
 {
-    <div style="font-weight:600;font-size:16px;">
-        <h4>القيد المختار</h4>
-        <span>الاسم: @name</span>
-        <br />
-        <span>رقم الحفظ: @docNo</span>
-        <br />
-        <span>رمز الجهة: @entity</span>
-        <br />
-        <span>التاريخ المختار: @(selectedDay?.ToString("dd/MM/yyyy"))</span><br /><hr />
-        @foreach (var day in activeDays)
-        {
-            <button type="button"
-                    class="btn @(selectedDay == day ? "btn-primary" : "btn-outline-primary") m-1"
-                    @onclick="() => SelectDay(day)">
-                @day.DayOfWeek - @day.ToString("yyyy-MM-dd")
-            </button>
-        }
-    </div>
+	<div class="" style="font-weight:600;font-size:16px;">
+		<div class="row justify-content-start">
+			<div class="col align-self-start">
 
-    <hr />
-    <MudTable T="PreReservation" Items="@ValidDbaRecords" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
-              RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader">
-        <HeaderContent>
-            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">التسلسل</MudTh>
+				<h4>القيد المختار</h4>
+				<h5>الاسم: @name</h5>
 
-            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">الاسم الكامل</MudTh>
-            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">اسم الأم</MudTh>
-            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رقم الحفظ</MudTh>
-            <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رمز الجهة</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Nr">@(ValidDbaRecords.IndexOf(context) + 1)</MudTd>
+				<h5>رقم الحفظ: @docNo</h5>
 
-            <MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
-                <MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
-                <MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
-                <MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
-            </RowTemplate>
-        </MudTable>
+				<h5>رمز الجهة: @entity</h5>
+
+				<h5>التاريخ المختار: @(selectedDay?.ToString("dd/MM/yyyy"))</h5><br />
+
+			</div>
+			<div class="col align-self-center">
+				<button class="btn btn-lg" style="background-color:rebeccapurple;color:white">حجز الموعد</button>
+			</div>
+		</div>
+	</div><br />
+	<h4>
+		من تاريخ
+		@(activeDays[0].ToString("dd/MM/yyyy"))
+		ولغاية تاريخ
+
+
+		@(activeDays[4].ToString("dd/MM/yyyy"))
+
+
+
+	</h4>
+	@if (FreeSpots != null && FreeSpots.Count > 0)
+	{
+		<table class="table">
+			<!-- Table Header -->
+			<thead>
+				<tr>
+					<th>الاحد</th>
+					<th>الاثنين</th>
+					<th>الثلاثاء</th>
+					<th>الاربعاء</th>
+					<th>الخميس</th>
+				</tr>
+			</thead>
+			<!-- Table Body -->
+			<tbody>
+				<!-- First 5 records of FreeSpots -->
+				<tr>
+					@for (int i = 0; i < 5; i++)
+					{
+						<td>
+							@if (i < FreeSpots.Count)
+							{
+								<h3 style="background-color:rebeccapurple;">@FreeSpots[i]</h3>
+							}
+						</td>
+					}
+				</tr>
+				<!-- Corresponding activeDays -->
+				<tr>
+					@for (int i = 0; i < 5; i++)
+					{
+						<td>
+							@if (i < activeDays.Count)
+							{
+								<button type="button"
+										class="btn @(selectedDay == activeDays[i] ? "btn-danger" : "btn-outline-danger") m-1"
+								@onclick="() => SelectDay(activeDays[i])">
+									@activeDays[i].ToString("yyyy-MM-dd")
+								</button>
+							}
+						</td>
+					}
+				</tr>
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<p>No free spots available.</p>
+	}
+
+
+
+	<hr />
+	<MudTable T="PreReservation" Items="@ValidDbaRecords" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+			  RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader">
+		<HeaderContent>
+			<MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">التسلسل</MudTh>
+
+			<MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">الاسم الكامل</MudTh>
+			<MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">اسم الأم</MudTh>
+			<MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رقم الحفظ</MudTh>
+			<MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رمز الجهة</MudTh>
+		</HeaderContent>
+		<RowTemplate>
+			<MudTd DataLabel="Nr">@(ValidDbaRecords.IndexOf(context) + 1)</MudTd>
+
+				<MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
+				<MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
+				<MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
+				<MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
+			</RowTemplate>
+		</MudTable>
 
 
 }
-
+@if (FreeSpots != null && FreeSpots.Count > 0)
+{
+	<ul>
+		@foreach (var spot in FreeSpots)
+		{
+			<li>@spot</li>
+		}
+	</ul>
+}
+else
+{
+	<p>No free spots available.</p>
+}
 @code {
-    int entityId;
-    string secret = string.Empty;
-    bool state = false;
-    private bool _processing = false;
-    string message = string.Empty;
-    private List<PreReservation> ValidDbaRecords = new List<PreReservation>();
-    private int selectedRowNumber = -1;
-    private MudTable<PreReservation> mudTable;
-    private string name = string.Empty;
-    private string motherName = string.Empty;
-    private int docNo;
-    private int entity;
-    private List<DateTime> activeDays = new List<DateTime>();
-    private DateTime? selectedDay;
-    private void RowClickEvent(TableRowClickEventArgs<PreReservation> tableRowClickEventArgs)
-    {
-        name = tableRowClickEventArgs.Item.full_name;
-        docNo = tableRowClickEventArgs.Item.doc_no;
-        entity = tableRowClickEventArgs.Item.EntityId;
-        motherName = tableRowClickEventArgs.Item.mother_name;
-    }
+	int index = 0;
+	int entityId;
+	bool state = false;
+	string message = string.Empty;
+	private List<PreReservation> ValidDbaRecords = new List<PreReservation>();
+	private int selectedRowNumber = -1;
+	private MudTable<PreReservation> mudTable;
+	private string name = string.Empty;
+	private string motherName = string.Empty;
+	private int docNo;
+	private int entity;
+	private string entityName = string.Empty;
+	private string entityCode = string.Empty;
+	private List<DateTime> activeDays = new List<DateTime>();
+	private DateTime? selectedDay;
+	private List<int> FreeSpots = new List<int>();
 
-    private string SelectedRowClassFunc(PreReservation element, int rowNumber)
-    {
-        if (selectedRowNumber == rowNumber)
-        {
-            selectedRowNumber = -1;
+	private void RowClickEvent(TableRowClickEventArgs<PreReservation> tableRowClickEventArgs)
+	{
+		name = tableRowClickEventArgs.Item.full_name;
+		docNo = tableRowClickEventArgs.Item.doc_no;
+		entity = tableRowClickEventArgs.Item.EntityId;
+		motherName = tableRowClickEventArgs.Item.mother_name;
+	}
 
-            return string.Empty;
-        }
-        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
-        {
-            selectedRowNumber = rowNumber;
-            name = element.full_name;
-            motherName = element.mother_name;
-            docNo = element.doc_no;
-            entity = element.EntityId;
-            //StateHasChanged();
-            return "selected";
-        }
-        else
-        {
-            return string.Empty;
-        }
-    }
+	private string SelectedRowClassFunc(PreReservation element, int rowNumber)
+	{
+		if (selectedRowNumber == rowNumber)
+		{
+			selectedRowNumber = -1;
 
-
-
-
-
+			return string.Empty;
+		}
+		else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+		{
+			selectedRowNumber = rowNumber;
+			name = element.full_name;
+			motherName = element.mother_name;
+			docNo = element.doc_no;
+			entity = element.EntityId;
+			//StateHasChanged();
+			return "selected";
+		}
+		else
+		{
+			return string.Empty;
+		}
+	}
 
 
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		entityCode = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PostalCode)?.Value;
+		entityName = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+
+		var today = DateTime.Today;
+		var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
+		for (int i = 0; i < 5; i++) // Sunday to Thursday
+		{
+			activeDays.Add(nextSunday.AddDays(i));
+		}
+
+		state = false;
+		if (int.TryParse(entityCode, out int entityCodeInt))
+		{
+			var result = await OracleService.GetPreValidRecords(entityCodeInt);
+			if (result != null && result.Success)
+			{
+
+				message = result.Message;
+				ValidDbaRecords = result.Data;
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        var today = DateTime.Today;
-        var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
-        for (int i = 0; i < 5; i++) // Sunday to Thursday
-        {
-            activeDays.Add(nextSunday.AddDays(i));
-        }
-    }
-    void SelectDay(DateTime day)
-    {
-        selectedDay = day;
-    }
-    bool IsButtonDisabled => string.IsNullOrWhiteSpace(secret) || entityId <= 0 || _processing;
-
-    async Task LoadData()
-    {
-        _processing = true;
-        state = false;
-        var result = await OracleService.GetPreValidRecords(entityId, secret);
-        if (result != null && result.Success)
-        {
-
-            message = result.Message;
-            state = true;
-            _processing = false;
-            ValidDbaRecords = result.Data;
-        }
-        await Task.Delay(1000);
-
-        StateHasChanged();
-    }
+			}
+			else
+			{
+				message = result.Message;
+			}
+			var SpotResults = await ReservationService.GetReservationSpotsAsync(entityCodeInt);
+			if (SpotResults != null && SpotResults.Success)
+			{
+				FreeSpots = SpotResults.Data;
+				await Task.Delay(500);
+				state = true;
+			}
+			else
+			{
+				message = SpotResults.Message;
+			}
+		}
+		else
+		{
+			message = "Error with entity Code";
+		}
 
 
+
+
+	}
+	void SelectDay(DateTime day)
+	{
+		selectedDay = day;
+	}
 
 }
 <style>
-    .selected {
-        background-color: thistle !important;
-    }
+	.selected {
+		background-color: thistle !important;
+	}
 
-        .selected > td {
-            color: white !important;
-        }
+		.selected > td {
+			color: white !important;
+		}
 
-            .selected > td .mud-input {
-                color: white !important;
-            }
+			.selected > td .mud-input {
+				color: white !important;
+			}
 
-    .testheader {
-        background-color: rebeccapurple;
-    }
+	.testheader {
+		background-color: rebeccapurple;
+	}
 
 </style>

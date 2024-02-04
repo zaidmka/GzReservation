@@ -29,7 +29,7 @@ namespace GzReservation.Server.Controllers
         };
             }
 
-            [HttpGet("{entityId}/{secret}")]
+            [HttpGet("{entityId}")]
             public ActionResult<ServiceResponse<List<PreReservation>>> GetSampleData()
             {
                 var response = new ServiceResponse<List<PreReservation>>

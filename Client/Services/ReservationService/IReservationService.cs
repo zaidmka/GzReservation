@@ -2,5 +2,6 @@
 {
     public interface IReservationService
     {
+        Task<ServiceResponse<List<int>>> GetReservationSpotsAsync(int entityId);
     }
 }

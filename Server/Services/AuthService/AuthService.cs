@@ -136,7 +136,9 @@ namespace GzReservation.Server.Services.AuthService
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(ClaimTypes.Email, user.fullname),
-                new Claim(ClaimTypes.GivenName, user.Entity.entity_name)
+                new Claim(ClaimTypes.GivenName, user.Entity.entity_name),
+                new Claim(ClaimTypes.PostalCode, user.EntityId.ToString()),
+
 
             };
 
