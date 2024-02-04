@@ -1,5 +1,6 @@
 ﻿using GzReservation.Server.Data;
 using GzReservation.Server.DTOs;
+using GzReservation.Shared;
 
 namespace GzReservation.Server.Services.ReservationService
 {
@@ -214,7 +215,7 @@ namespace GzReservation.Server.Services.ReservationService
             Entity entity = await _dataContext.entities.FindAsync(entityId);
 
             if (entity == null) { }
-            
+
             try
             {
                 // Define valid weekdays and maximum global reservations per day
@@ -231,7 +232,7 @@ namespace GzReservation.Server.Services.ReservationService
                 var endOfNextWeekDateOnly = DateOnly.FromDateTime(endOfNextWeek);
                 // Initialize list to hold free spots for each day
                 List<int> freeEntitySpotsList = new List<int>();
-                int totalWeekPerEntity=0;
+                int totalWeekPerEntity = 0;
                 // Loop through each day of the next active week
                 bool exceededMaxWeekLimit = false;
 
@@ -295,12 +296,47 @@ namespace GzReservation.Server.Services.ReservationService
                 };
             }
         }
-    
+
 
         public Task<ServiceResponse<Reservation>> GetReservation(int reservationId)
         {
             throw new NotImplementedException();
         }
+
+        public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId)
+        {
+            try { 
+            // Calculate the start and end of the next active week
+            var today = DateTime.Today;
+            var startOfNextWeek = today.AddDays((int)DayOfWeek.Sunday - (int)today.DayOfWeek + 7);
+            var endOfNextWeek = startOfNextWeek.AddDays(4);
+
+            // Convert DateTime to DateOnly for comparison
+            var startOfNextWeekDateOnly = DateOnly.FromDateTime(startOfNextWeek);
+            var endOfNextWeekDateOnly = DateOnly.FromDateTime(endOfNextWeek);
+
+            var reservations = await _dataContext.reservations
+                    .Where(r => r.reservation_date >= startOfNextWeekDateOnly
+                                && r.reservation_date <= endOfNextWeekDateOnly
+                                && r.EntityId == entityId)
+                    .Include(e=>e.Entity)
+                    .ToListAsync();
+
+
+            return new ServiceResponse<List<Reservation>> { Data = reservations, Message="okay",Success=true };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<List<Reservation>>
+                {
+                    Data = null,
+                    Message = $"An error occurred: {ex.Message}",
+                    Success = false
+                };
+            }
+        }
+
+
 
         public Task<ServiceResponse<List<Reservation>>> GetReservationsAsync()
         {
