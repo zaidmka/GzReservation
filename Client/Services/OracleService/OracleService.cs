@@ -37,7 +37,7 @@ namespace GzReservation.Client.Services.OracleService
 
         public async Task<ServiceResponse<List<PreReservation>>> GetPreValidRecords(int entityId)
         {
-            var result = await _http.GetFromJsonAsync<ServiceResponse<List<PreReservation>>>($"api/test/{entityId}");
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<PreReservation>>>($"api/oracle/entity/{entityId}");
             return result;
         }
 

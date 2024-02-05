@@ -1,0 +1,173 @@
+﻿@inject IReservationService ReservationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@using System.Security.Claims
+
+@if (!state)
+{
+    <div class="center-content">
+        <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" /><br />
+        <h4 style="font-family:Cairo">
+            جاري تحميل القيود
+        </h4>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+
+    </div>
+
+}
+else
+{
+
+    <div class="center-div">
+        <h3>
+            حجز الموعد
+            (@entityName)
+        </h3>
+
+    </div>
+    <div class="center-content">
+
+        <h4>
+            من تاريخ
+            <span style="color:red">@(activeDays[0].ToString("dd/MM/yyyy"))</span>
+            ولغاية تاريخ
+            <span style="color:red">@(activeDays[4].ToString("dd/MM/yyyy"))</span>
+
+        </h4>
+    </div>
+    <br />
+    <div class="custom-table">
+        <MudTable T="Reservation" Items="@ReservationDba" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+                  RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader">
+            <HeaderContent>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">التسلسل</MudTh>
+
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">الاسم الكامل</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">اسم الأم</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رقم الحفظ</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">تاريخ الحجز</MudTh>
+
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رمز الجهة</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nr">@(ReservationDba.IndexOf(context) + 1)</MudTd>
+
+                    <MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="Position">@context.reservation_date</MudTd>
+
+                    <MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+}
+
+@code{
+    string entityCode = string.Empty;
+    string entityName = string.Empty;
+    string user = string.Empty;
+    string message = string.Empty;
+    bool state = false;
+    List<Reservation> ReservationDba = new List<Reservation>();
+    private MudTable<Reservation> mudTable;
+    private int selectedRowNumber = -1;
+    private List<DateTime> activeDays = new List<DateTime>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        entityCode = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PostalCode)?.Value;
+        entityName = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+        user = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var today = DateTime.Today;
+        var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
+        for (int i = 0; i < 5; i++) // Sunday to Thursday
+        {
+            activeDays.Add(nextSunday.AddDays(i));
+        }
+        await LoadData();
+
+    }
+
+
+
+
+    private async Task LoadData()
+    {
+        if (int.TryParse(entityCode, out int entityCodeInt))
+        {
+            await LoadReservationByEntity(entityCodeInt);
+        }
+        else
+        {
+            message = "خطا في الجهة";
+        }
+    }
+    private async Task LoadReservationByEntity(int entityCodeInt)
+    {
+        var DbaResults = await ReservationService.GetReservationByEntity(entityCodeInt);
+        if (DbaResults != null && DbaResults.Success)
+        {
+            ReservationDba = DbaResults.Data;
+            await Task.Delay(500); // Consider explaining why this delay is needed, or remove it if not necessary
+            state = true;
+        }
+        else
+        {
+            message = DbaResults.Message;
+            // Consider adding more robust error handling or user feedback here
+        }
+    }
+
+
+
+    private void RowClickEvent(TableRowClickEventArgs<Reservation> tableRowClickEventArgs)
+    {
+
+    }
+
+    private string SelectedRowClassFunc(Reservation element, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+
+}
+
+
+
+
+<style>
+    .selected {
+        background-color: thistle !important;
+    }
+
+        .selected > td {
+            color: white !important;
+        }
+
+            .selected > td .mud-input {
+                color: white !important;
+            }
+
+    .testheader {
+        background-color: rebeccapurple;
+    }
+
+</style>

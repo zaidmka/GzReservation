@@ -16,6 +16,7 @@
 </div>
 @if (!state)
 {
+   
     <div class="center-content">
         <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" /><br />
         <h4 style="font-family:Cairo">
@@ -29,6 +30,7 @@
 }
 else
 {
+
     <div class="center-content">
 
         <h4>
@@ -40,6 +42,22 @@ else
         </h4>
     </div>
     <br />
+    @if (ShowAlert)
+    {
+
+        @if (ReservationState)
+        {
+            <MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="(() => CloseMe(false))">
+                @ReservationMessage - <span>@AddedReservation.full_name</span> - <span>@AddedReservation.reservation_date</span> - <span>@AddedReservation.id</span>
+            </MudAlert>
+
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="(() => CloseMe(false))">@ReservationMessage</MudAlert>
+
+        }
+    }
     <table class="table table-bordered custom-table">
         <thead>
             <!-- First row with a single header cell spanning all columns -->
@@ -171,22 +189,7 @@ else
 }
 
 
-@if (ShowAlert)
-{
-   
-    @if (ReservationState)
-    {
-        <MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="(() => CloseMe(false))">
-            @ReservationMessage - <span>@AddedReservation.full_name</span> - <span>@AddedReservation.reservation_date</span> - <span>@AddedReservation.id</span>
-        </MudAlert>
 
-    }
-    else
-    {
-        <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="(() => CloseMe(false))">@ReservationMessage</MudAlert>
-
-    }
-}
 
 @code {
     int index = 0;

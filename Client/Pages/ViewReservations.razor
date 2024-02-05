@@ -1,0 +1,36 @@
+﻿@page "/reservations"
+@inject IReservationService ReservationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@using System.Security.Claims
+
+<PageTitle>Sponser</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+       <Reservations/>
+    </Authorized>
+    <NotAuthorized>
+        <div class="center-content">
+            <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
+            <h4 style="font-family:Cairo">
+                الرجاء تسجيل
+                <a href="login">الدخول  <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Info" Size="Size.Medium" /> </a>
+                لغرض المحتوى
+            </h4>
+            <h4 style="font-family:Cairo;color:red">
+                النظام خاص بقسم اصدار هويات دخول المنطقة الخضراء, يمسح بالدخول للاشخاص المخولين فقط
+            </h4>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var authToken = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "authToken");
+        // Logic to set authentication state based on authToken
+        // This may involve setting the AuthenticationStateProvider's state based on the presence of authToken
+    }
+}
+   

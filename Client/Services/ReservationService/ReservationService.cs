@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using GzReservation.Client.DTOs;
+using System.Net.Http.Json;
 
 namespace GzReservation.Client.Services.ReservationService
 {
@@ -36,6 +37,13 @@ namespace GzReservation.Client.Services.ReservationService
 
         }
 
+
+
+        public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<Reservation>>>($"api/reservation/reservations/{entityId}");
+            return result;
+        }
 
         public async Task<ServiceResponse<List<int>>> GetReservationSpotsAsync(int entityId)
 		{

@@ -101,6 +101,17 @@ namespace GzReservation.Server.Services.OracleService
 
         public async Task<ServiceResponse<List<PreReservation>>> GetRecoredsByEntity(int entityCode)
         {
+            string formattedCode;
+
+            if (entityCode >= 1 && entityCode <= 9)
+            {
+                formattedCode = entityCode.ToString("D2"); // Formats the number as a two-digit string with leading zeros if necessary
+            }
+            else
+            {
+                formattedCode = entityCode.ToString(); // Just convert to string if it's not between 1 and 9
+            }
+            Console.WriteLine(formattedCode);
             using (OracleConnection con = new OracleConnection(_connectionString))
             {
                 using (OracleCommand cmd = con.CreateCommand())
@@ -113,10 +124,10 @@ namespace GzReservation.Server.Services.OracleService
                         cmd.BindByName = true;
 
                         // Replace with your actual SQL query
-                        cmd.CommandText = "SELECT DOC_NO, NAME, ENTITY_CODE,MOTHER_NAME FROM APPL_VIEWBZ WHERE ENTITY_CODE = :EntityCode and TRANSACTION_DATE > to_date('15/06/2023','dd/MM/yyyy') and TRANSACTION_TYPE like :trans and bar_code not in (select bar_code from appl_viewbz where transaction_type like :trans1)  order by DOC_NO";
-                        cmd.Parameters.Add("EntityCode", OracleDbType.Varchar2).Value = entityCode;
-                        cmd.Parameters.Add("trans", OracleDbType.Varchar2).Value = "مقابلة امنية";
-                        cmd.Parameters.Add("trans1", OracleDbType.Varchar2).Value = "اجتياز مقابلة";
+                        cmd.CommandText = "SELECT DOC_NO, NAME, ENTITY_CODE,MOTHER_NAME FROM APPL_VIEWBZ WHERE ENTITY_CODE = :EntityCode and TRANSACTION_DATE > to_date('01/10/2023','dd/MM/yyyy') order by DOC_NO";
+                        cmd.Parameters.Add("EntityCode", OracleDbType.Varchar2).Value = formattedCode;
+                        //cmd.Parameters.Add("trans", OracleDbType.Varchar2).Value = "مقابلة امنية";
+                        //cmd.Parameters.Add("trans1", OracleDbType.Varchar2).Value = "اجتياز مقابلة";
 
                         using (DbDataReader reader = await cmd.ExecuteReaderAsync())
                         {
