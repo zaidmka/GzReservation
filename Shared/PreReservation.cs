@@ -11,6 +11,7 @@ namespace GzReservation.Shared
         public int doc_no { get; set; }
         public string full_name { get; set; } = string.Empty;
         public string mother_name { get; set; } = string.Empty;
+        public DateOnly amn_date { get; set; }
         public int EntityId { get; set; }
         public Entity? Entity { get; set; }
     }
