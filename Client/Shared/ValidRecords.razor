@@ -38,8 +38,11 @@ else
 			<span style="color:red">@(activeDays[0].ToString("dd/MM/yyyy"))</span>
 			ولغاية تاريخ
 			<span style="color:red">@(activeDays[4].ToString("dd/MM/yyyy"))</span>
-
+			<span>(
+				@if(totalPerEntity>0){@totalPerEntity} )
+			</span>
 		</h4>
+		
 	</div>
 	<br />
 	@if (ShowAlert)
@@ -219,6 +222,7 @@ else
 	bool ShowAlert = false;
 	private bool showCallAlert = true;
 	private bool showLeaveAlert = true;
+	private int totalPerEntity;
 
 
 
@@ -337,6 +341,7 @@ else
 		{
 			await LoadValidDbaRecords(entityCodeInt);
 			await LoadReservationSpots(entityCodeInt);
+			totalPerEntity = FreeSpots[5];
 		}
 		else
 		{
