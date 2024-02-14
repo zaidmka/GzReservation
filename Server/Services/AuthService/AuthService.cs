@@ -156,6 +156,8 @@ namespace GzReservation.Server.Services.AuthService
 
             return jwt;
         }
+
+
     }
 
 }

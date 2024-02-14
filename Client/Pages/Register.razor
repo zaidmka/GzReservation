@@ -34,7 +34,10 @@
             <InputText id="confirmPassword" @bind-Value="user.ConfirmPassword" class="form-control" type="password" />
             <ValidationMessage For="@(() => user.ConfirmPassword)" />
             <br />
-
+            <label for="confirmPassword">رمز الجهة</label>
+            <InputNumber id="confirmPassword" @bind-Value="user.EntityId" class="form-control" type="password" />
+            <ValidationMessage For="@(() => user.EntityId)" />
+            <br />
             <button type="submit" class="btn btn-primary">Register</button>
             <div class="@messageCssClass">
                 <span>@message</span>

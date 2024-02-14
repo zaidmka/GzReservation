@@ -12,5 +12,6 @@
         string GetUserEmail();
 
         Task<UserEntity> GetUserByEmail(string email);
+
     }
 }

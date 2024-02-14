@@ -34,7 +34,7 @@ namespace GzReservation.Server.Services.ReservationService
                         };
                     }
                     // Check global daily limit
-                    const int maxReservationsPerDayGlobal = 25;
+                    const int maxReservationsPerDayGlobal = 65;
                     int totalReservationsForDay = await _dataContext.reservations
                         .Where(r => r.reservation_date == reservationDto.reservation_date)
                         .CountAsync();

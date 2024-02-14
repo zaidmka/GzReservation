@@ -65,4 +65,34 @@ public class AuthController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost("registerall")]
+
+    public async Task<ActionResult<ServiceResponse<List<int>>>> Register([FromBody] UserRegister[] requests)
+    {
+        var responses = new List<ServiceResponse<int>>();
+
+        foreach (var request in requests)
+        {
+            var response = await _authService.Register(new UserEntity
+            {
+                Email = request.Email,
+                fullname = request.fullname,
+                EntityId = request.EntityId
+            },
+            request.Password);
+
+            responses.Add(response);
+        }
+
+        // Check if all registrations were successful
+        if (responses.Any(r => !r.Success))
+        {
+            return BadRequest(responses);
+        }
+
+        return Ok(responses);
+    }
+
+
 }
