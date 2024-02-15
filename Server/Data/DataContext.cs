@@ -26,6 +26,7 @@ namespace GzReservation.Server.Data
 
         public DbSet<Entity> entities { get; set; }
         public DbSet<Reservation> reservations { get; set; }
+        public DbSet<ActiveHour> activehours { get; set; }
 
 
 

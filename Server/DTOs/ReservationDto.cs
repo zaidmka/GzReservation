@@ -10,6 +10,7 @@
     DateOnly reservation_date,
     int EntityId,
     bool state,
-    string uuser
+    string uuser,
+    string reservation_hour
 );
 }

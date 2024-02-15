@@ -17,9 +17,11 @@ namespace GzReservation.Shared
         public DateTime action_date { get; set; }
         public string uuser { get; set; } = string.Empty;
         public bool state { get; set; }
+        public string reservation_hour { get; set; } = string.Empty;
         public DateOnly reservation_date { get; set; }
         public int EntityId { get; set; }
         public Entity? Entity { get; set; }
+
 
 
 

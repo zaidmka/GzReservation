@@ -34,7 +34,7 @@ namespace GzReservation.Server.Services.ReservationService
                         };
                     }
                     // Check global daily limit
-                    const int maxReservationsPerDayGlobal = 65;
+                    const int maxReservationsPerDayGlobal = 100;
                     int totalReservationsForDay = await _dataContext.reservations
                         .Where(r => r.reservation_date == reservationDto.reservation_date)
                         .CountAsync();
@@ -86,9 +86,9 @@ namespace GzReservation.Server.Services.ReservationService
                     }
                     //check the doc_no is not repeated for the next week reservation
                     int DocNoCount = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly &&r.doc_no ==reservationDto.doc_no)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly && r.doc_no == reservationDto.doc_no)
                         .CountAsync();
-                    if(DocNoCount >= 1)
+                    if (DocNoCount >= 1)
                     {
                         return new ServiceResponse<Reservation>
                         {
@@ -112,6 +112,32 @@ namespace GzReservation.Server.Services.ReservationService
                             Success = false
                         };
                     }
+                    //check the active hours
+                    var activehour = await _dataContext.activehours
+                        .Where(a => a.hour == reservationDto.reservation_hour)
+                        .FirstOrDefaultAsync();
+                    if (activehour == null)
+                    {
+                        return new ServiceResponse<Reservation>
+                        {
+                            Data = null,
+                            Message = "Reservation hour not correct.",
+                            Success = false
+                        };
+
+                    }
+                    int reservationHourCount = await _dataContext.reservations
+                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour==reservationDto.reservation_hour)
+                        .CountAsync();
+                    if (reservationHourCount >= activehour.max)
+                    {
+                        return new ServiceResponse<Reservation>
+                        {
+                            Data = null,
+                            Message = "Reservation hour max limit Reach!.",
+                            Success = false
+                        };
+                    }
                     else
                     {
                         // Create and add the new reservation
@@ -125,7 +151,8 @@ namespace GzReservation.Server.Services.ReservationService
                             mother_name = reservationDto.mother_name,
                             reservation_date = reservationDto.reservation_date,
                             state = reservationDto.state,
-                            uuser = reservationDto.uuser
+                            uuser = reservationDto.uuser,
+                            reservation_hour = reservationDto.reservation_hour
                         };
 
                         _dataContext.reservations.Add(newReservation);
@@ -319,25 +346,26 @@ namespace GzReservation.Server.Services.ReservationService
 
         public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId)
         {
-            try { 
-            // Calculate the start and end of the next active week
-            var today = DateTime.Today;
-            var startOfNextWeek = today.AddDays((int)DayOfWeek.Sunday - (int)today.DayOfWeek + 7);
-            var endOfNextWeek = startOfNextWeek.AddDays(4);
+            try
+            {
+                // Calculate the start and end of the next active week
+                var today = DateTime.Today;
+                var startOfNextWeek = today.AddDays((int)DayOfWeek.Sunday - (int)today.DayOfWeek + 7);
+                var endOfNextWeek = startOfNextWeek.AddDays(4);
 
-            // Convert DateTime to DateOnly for comparison
-            var startOfNextWeekDateOnly = DateOnly.FromDateTime(startOfNextWeek);
-            var endOfNextWeekDateOnly = DateOnly.FromDateTime(endOfNextWeek);
+                // Convert DateTime to DateOnly for comparison
+                var startOfNextWeekDateOnly = DateOnly.FromDateTime(startOfNextWeek);
+                var endOfNextWeekDateOnly = DateOnly.FromDateTime(endOfNextWeek);
 
-            var reservations = await _dataContext.reservations
-                    .Where(r => r.reservation_date >= startOfNextWeekDateOnly
-                                && r.reservation_date <= endOfNextWeekDateOnly
-                                && r.EntityId == entityId)
-                    .Include(e=>e.Entity)
-                    .ToListAsync();
+                var reservations = await _dataContext.reservations
+                        .Where(r => r.reservation_date >= startOfNextWeekDateOnly
+                                    && r.reservation_date <= endOfNextWeekDateOnly
+                                    && r.EntityId == entityId)
+                        .Include(e => e.Entity)
+                        .ToListAsync();
 
 
-            return new ServiceResponse<List<Reservation>> { Data = reservations, Message="okay",Success=true };
+                return new ServiceResponse<List<Reservation>> { Data = reservations, Message = "okay", Success = true };
             }
             catch (Exception ex)
             {
