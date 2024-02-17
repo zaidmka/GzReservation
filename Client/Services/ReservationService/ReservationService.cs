@@ -45,7 +45,24 @@ namespace GzReservation.Client.Services.ReservationService
             return result;
         }
 
-        public async Task<ServiceResponse<List<int>>> GetReservationSpotsAsync(int entityId)
+		public async Task<ServiceResponse<List<HourAvailability>>> GetReservationByHour(DateOnly reservationDate)
+		{
+			try
+			{
+				string formattedDate = reservationDate.ToString("yyyy-MM-dd"); // Adjust the format as needed
+				var result = await _http.GetFromJsonAsync<ServiceResponse<List<HourAvailability>>>($"api/Reservation/reservationhour/{formattedDate}");
+				return result;
+			}
+			catch (Exception ex)
+			{
+				// Log the exception or handle it as needed
+				Console.WriteLine($"Error in GetReservationByHour: {ex.Message}");
+				return null; // Or handle the error as appropriate
+			}
+		}
+
+
+		public async Task<ServiceResponse<List<int>>> GetReservationSpotsAsync(int entityId)
 		{
 			var result = await _http.GetFromJsonAsync<ServiceResponse<List<int>>>($"api/reservation/{entityId}");
 			return result;

@@ -19,6 +19,7 @@ namespace GzReservation.Shared
         public string Role { get; set; } = "User";
         public string fullname { get; set; } = string.Empty;
         public int EntityId { get; set; }
+
         public Entity? Entity { get; set; }
     }
 }

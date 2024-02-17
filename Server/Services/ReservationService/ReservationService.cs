@@ -121,7 +121,7 @@ namespace GzReservation.Server.Services.ReservationService
                         return new ServiceResponse<Reservation>
                         {
                             Data = null,
-                            Message = "Reservation hour not correct.",
+                            Message = "ساعة الحجز غير صحيحة.",
                             Success = false
                         };
 
@@ -134,7 +134,7 @@ namespace GzReservation.Server.Services.ReservationService
                         return new ServiceResponse<Reservation>
                         {
                             Data = null,
-                            Message = "Reservation hour max limit Reach!.",
+                            Message = "تم ملئ جميع مواعيد الحجز في الساعة المطلوبة.",
                             Success = false
                         };
                     }
@@ -201,7 +201,7 @@ namespace GzReservation.Server.Services.ReservationService
             {
                 // Define valid weekdays and maximum global reservations per day
                 var validWeekdays = new DayOfWeek[] { DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday };
-                const int maxReservationsPerDayGlobal = 25;
+                const int maxReservationsPerDayGlobal = 100;
 
                 // Calculate the start and end of the next active week
                 var today = DateTime.Today;
@@ -378,7 +378,54 @@ namespace GzReservation.Server.Services.ReservationService
             }
         }
 
+        public async Task<ServiceResponse<List<HourAvailability>>> GetReservationHourByDay(DateOnly reservationDate)
+        {
 
+
+            // Retrieve all active hours
+            var activeHours = await _dataContext.activehours
+                .OrderBy(ah=>ah.id)
+                .ToListAsync();
+
+            // List to store availability for each hour
+            var availabilityList = new List<HourAvailability>();
+            foreach (var activeHour in activeHours)
+            {
+                // Find reservations for this hour on the given day
+                var reservationsCount = await _dataContext.reservations
+                    .CountAsync(r => r.reservation_date == reservationDate &&
+                                     r.reservation_hour == activeHour.hour); 
+
+                // Calculate available spots
+                int availableSpots = activeHour.max - reservationsCount;
+
+                // Add to availability list
+                availabilityList.Add(new HourAvailability
+                {
+                    Hour = activeHour.hour, // Now using string
+                    AvailableSpots = availableSpots
+                });
+            }
+
+            if(availabilityList.Count > 0)
+            {
+                return new ServiceResponse<List<HourAvailability>>
+                {
+                    Data = availabilityList,
+                    Success = true,
+                    Message = "okay"
+                };
+
+            }
+            else
+            {
+                return new ServiceResponse<List<HourAvailability>> { Data = null, Success = false, Message = "Error" };
+            }
+
+
+
+
+        }
 
         public Task<ServiceResponse<List<Reservation>>> GetReservationsAsync()
         {

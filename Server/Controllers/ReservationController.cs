@@ -38,5 +38,13 @@ namespace GzReservation.Server.Controllers
             return Ok(result);
         }
 
+        [HttpGet("reservationhour/{reservationDate}")]
+        public async Task<ActionResult<ServiceResponse<List<HourAvailability>>>> GetReservationByHours(DateOnly reservationDate)
+        {
+            var result = await _reservationService.GetReservationHourByDay(reservationDate);
+            return Ok(result);
+        }
+
+
     }
 }
