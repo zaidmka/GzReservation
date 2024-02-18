@@ -159,7 +159,37 @@ namespace GzReservation.Server.Services.AuthService
             return jwt;
         }
 
+        public async Task<ServiceResponse<bool>> FirstLogin(int userId, string newPassword, string newFullName)
+        {
+            var user = await _context.usersentity.FindAsync(userId);
+            if (user == null)
+            {
+                return new ServiceResponse<bool>
+                { Data = false,
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+            if(user.new_user == "no")
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Success = false,
+                    Message = "المستخدم موجود مسبقا وغير جديد"
+                };
+            }
+            CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.fullname = newFullName;
+            user.new_user = "no";
+
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<bool> { Data = true, Message = "تم تغيير المعلومات بنجاح.", Success = true };
+        }
     }
 
 }

@@ -19,7 +19,11 @@ namespace GzReservation.Client.Services.AuthService
             return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
         }
 
-
+        public async Task<ServiceResponse<bool>> Firstlogin(UserFirstLogin request)
+        {
+            var result = await _http.PostAsJsonAsync("api/auth/firstLogin", request);
+            return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+        }
 
         public async Task<ServiceResponse<string>> Login(UserLogin request)
         {

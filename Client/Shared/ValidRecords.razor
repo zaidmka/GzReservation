@@ -406,7 +406,7 @@ else
     {
         if (int.TryParse(entityCode, out int entityCodeInt))
         {
-            //await LoadValidDbaRecords(entityCodeInt);							// stop to disable oracle connections
+            await LoadValidDbaRecords(entityCodeInt);							// stop to disable oracle connections
             await LoadReservationSpots(entityCodeInt);
             totalPerEntity = FreeSpots[5];
         }

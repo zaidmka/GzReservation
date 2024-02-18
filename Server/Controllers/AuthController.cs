@@ -93,6 +93,24 @@ public class AuthController : ControllerBase
 
         return Ok(responses);
     }
+    [HttpPost("firstLogin"), Authorize]
+    public async Task<ActionResult<ServiceResponse<bool>>> FirstLogin(UserFirstLogin user)
+    {
+        // Check if the user is authenticated
+        if (!User.Identity.IsAuthenticated)
+        {
+            return Unauthorized(); // Return 401 Unauthorized if the user is not authenticated
+        }
 
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var response = await _authService.FirstLogin(int.Parse(userId), user.Password,user.full_name);
+
+        if (!response.Success)
+        {
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
 
 }

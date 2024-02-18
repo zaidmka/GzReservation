@@ -6,6 +6,7 @@
         Task<bool> UserExists(string email);
         Task<ServiceResponse<string>> Login(string email, string password);
         Task<ServiceResponse<bool>> ChangePassword(int userId, string newPassword);
+        Task<ServiceResponse<bool>> FirstLogin(int userId, string newPassword,string newFullName);
 
         int GetUserId();
 

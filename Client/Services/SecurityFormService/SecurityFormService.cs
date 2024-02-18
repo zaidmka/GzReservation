@@ -1,7 +1,6 @@
 ﻿using GzReservation.Shared;
 using System.Net.Http;
 using System.Net.Http.Json;
-using static System.Reflection.Metadata.BlobBuilder;
 
 namespace GzReservation.Client.Services.SecurityFormService
 {
@@ -15,4 +14,4 @@ namespace GzReservation.Client.Services.SecurityFormService
         }
 
        
-}
+}}
