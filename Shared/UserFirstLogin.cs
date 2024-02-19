@@ -13,6 +13,8 @@ namespace GzReservation.Shared
         public string Password { get; set; } = string.Empty;
         [Compare("Password", ErrorMessage = "The passwords do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
+        [Required, StringLength(100, MinimumLength = 10)]
+
         public string full_name { get; set; } = string.Empty;
     }
 }

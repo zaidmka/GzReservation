@@ -2,7 +2,7 @@
 
 @inject IAuthService AuthService
 @attribute [Authorize]
-
+@message
 <AuthorizeView>
     <h3>اهلا وسهلا سيد
 
@@ -35,7 +35,7 @@
     <button type="submit" class="btn btn-primary">تغيير</button>
     </div></div>
 </EditForm>
-@message
+
 
 @code {
     UserChangePassword request = new UserChangePassword();

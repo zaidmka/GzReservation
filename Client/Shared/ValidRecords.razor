@@ -246,7 +246,7 @@ else
     private List<PreReservation> ValidDbaRecords = new List<PreReservation>();
     private int selectedRowNumber = -1;
     private MudTable<PreReservation> mudTable;
-    private string name = "zaid";
+    private string name =string.Empty;
     private string motherName = string.Empty;
     private int docNo;
     private int entity = 98; // remove the 98 in gz office
@@ -368,6 +368,13 @@ else
 
         if (!resultDialog.Cancelled)
         {
+            if(docNo == 0 ||name==null||entity==null||motherName==null||selectedDay == null || selectedHour == null)
+            {
+                ReservationMessage = "المعلومات غير كاملة" + "\\" + "الرجاء اختبار التاريخ والوقت والاسم قبل تفعيل الحجز";
+                ShowAlert = true;
+                StateHasChanged();
+                return;
+            }
             ReservationDto NewReservation = new ReservationDto
                 {
                     doc_no = docNo,
