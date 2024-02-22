@@ -67,7 +67,8 @@
             await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "authToken", result.Data);
 
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            NavigationManager.NavigateTo(returnUrl, true);
+            StateHasChanged();
+            NavigationManager.NavigateTo(returnUrl);
             check = true;
         }
         else
