@@ -38,10 +38,21 @@ namespace GzReservation.Server.Services.AuthService
             return new ServiceResponse<bool> { Data = true, Message = "Password has been changed." };
         }
 
-        public Task<UserEntity> GetUserByEmail(string email)
+        public async Task<ServiceResponse<UserEntity>> GetUserByEmail(string email)
         {
-            throw new NotImplementedException();
+            var user = await _context.usersentity
+                .Include(e=>e.Entity)
+                .FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return new ServiceResponse<UserEntity> { Data = null, Success = false, Message = "User not found." };
+            }
+            else
+            {
+                return new ServiceResponse<UserEntity> { Data = user, Success = true };
+            }
         }
+
 
         public string GetUserEmail()
         {
@@ -136,8 +147,8 @@ namespace GzReservation.Server.Services.AuthService
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(ClaimTypes.Email, user.fullname),
-                new Claim(ClaimTypes.GivenName, user.Entity.entity_name),
-                new Claim(ClaimTypes.PostalCode, user.EntityId.ToString()),
+               // new Claim(ClaimTypes.GivenName, user.Entity.entity_name),
+               // new Claim(ClaimTypes.PostalCode, user.EntityId.ToString()),
                 new Claim(ClaimTypes.Country, user.new_user),
 
 

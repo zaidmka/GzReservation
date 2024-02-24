@@ -12,7 +12,7 @@
 
         string GetUserEmail();
 
-        Task<UserEntity> GetUserByEmail(string email);
+        Task<ServiceResponse<UserEntity>> GetUserByEmail(string email);
 
     }
 }

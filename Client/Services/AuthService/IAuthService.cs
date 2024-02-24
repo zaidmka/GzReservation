@@ -8,6 +8,7 @@ namespace GzReservation.Client.Services.AuthService
         Task<ServiceResponse<string>> Login(UserLogin request);
         Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request);
         Task<ServiceResponse<bool>> Firstlogin(UserFirstLogin request);
+        Task<ServiceResponse<UserEntity>> GetUserInfo(string userEmail);
 
     }
 }

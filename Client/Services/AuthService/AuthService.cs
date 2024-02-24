@@ -25,6 +25,12 @@ namespace GzReservation.Client.Services.AuthService
             return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
         }
 
+        public async Task<ServiceResponse<UserEntity>> GetUserInfo(string userEmail)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<UserEntity>>($"api/auth/{userEmail}");
+            return result;
+        }
+
         public async Task<ServiceResponse<string>> Login(UserLogin request)
         {
             var result = await _http.PostAsJsonAsync("api/auth/login", request);

@@ -68,7 +68,7 @@
 
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
             StateHasChanged();
-            NavigationManager.NavigateTo(returnUrl);
+            NavigationManager.NavigateTo(returnUrl,true);
             check = true;
         }
         else

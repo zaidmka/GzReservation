@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
             Email = request.Email,
             fullname = request.fullname,
             EntityId = request.EntityId
-            
+
         },
         request.Password);
         if (!response.Success)
@@ -46,14 +46,14 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("change-password"),Authorize]
+    [HttpPost("change-password"), Authorize]
     public async Task<ActionResult<ServiceResponse<bool>>> ChangePassword([FromBody] string newPassword)
     {
         // Check if the user is authenticated
         if (!User.Identity.IsAuthenticated)
         {
             return Unauthorized(); // Return 401 Unauthorized if the user is not authenticated
-       }
+        }
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var response = await _authService.ChangePassword(int.Parse(userId), newPassword);
@@ -103,7 +103,7 @@ public class AuthController : ControllerBase
         }
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var response = await _authService.FirstLogin(int.Parse(userId), user.Password,user.full_name);
+        var response = await _authService.FirstLogin(int.Parse(userId), user.Password, user.full_name);
 
         if (!response.Success)
         {
@@ -111,6 +111,13 @@ public class AuthController : ControllerBase
         }
 
         return Ok(response);
+    }
+
+    [HttpGet("{userEmail}"),Authorize]
+    public async Task<ActionResult<ServiceResponse<UserEntity>>>GetUserInfo(string userEmail)
+    {
+        var result = await _authService.GetUserByEmail(userEmail);
+        return Ok(result);
     }
 
 }
