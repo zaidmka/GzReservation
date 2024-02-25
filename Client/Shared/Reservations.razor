@@ -1,6 +1,7 @@
 ﻿@inject IReservationService ReservationService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
+@inject IAuthService AuthService
 @using System.Security.Claims
 
 @if (!state)
@@ -46,6 +47,7 @@ else
                 <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">اسم الأم</MudTh>
                 <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رقم الحفظ</MudTh>
                 <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">تاريخ الحجز</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">ساعة الحجز</MudTh>
 
                 <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رمز الجهة</MudTh>
             </HeaderContent>
@@ -56,6 +58,7 @@ else
                     <MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
                     <MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
                     <MudTd Style="font-weight:600" DataLabel="Position">@context.reservation_date</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="Position">@context.reservation_hour</MudTd>
 
                     <MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
                 </RowTemplate>
@@ -78,9 +81,15 @@ else
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        entityCode = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PostalCode)?.Value;
-        entityName = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
-        user = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+       
+        user = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        var userInfo = await AuthService.GetUserInfo(user);
+        if(userInfo ==null){}
+        else
+        {
+            entityCode = userInfo.Data.EntityId.ToString();
+            entityName = userInfo.Data.Entity.entity_name;
+        }
         var today = DateTime.Today;
         var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
         for (int i = 0; i < 5; i++) // Sunday to Thursday

@@ -6,6 +6,7 @@
 @inject IReservationService ReservationService
 @using System.Security.Claims
 @inject IDialogService DialogService
+@inject IAuthService AuthService
 
 <div class="center-div">
     <h3>
@@ -303,9 +304,15 @@ else
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        entityCode = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PostalCode)?.Value;
-        entityName = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
-        user = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        user = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        var userInfo = await AuthService.GetUserInfo(user);
+        if (userInfo == null) { }
+        else
+        {
+            entityCode = userInfo.Data.EntityId.ToString();
+            entityName = userInfo.Data.Entity.entity_name;
+        }
 
         var today = DateTime.Today;
         var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
