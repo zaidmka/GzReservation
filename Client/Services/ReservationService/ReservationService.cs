@@ -37,7 +37,27 @@ namespace GzReservation.Client.Services.ReservationService
 
         }
 
+        public async Task<ServiceResponse<Reservation>> AddReservationNextWeek(ReservationDto reservationDto)
+        {
+            // Send the form to the API
+            var result = await _http.PostAsJsonAsync("/nextweek", reservationDto);
 
+            // Read the response as ServiceResponse<Form>
+            var serviceResponse = await result.Content.ReadFromJsonAsync<ServiceResponse<Reservation>>();
+
+            if (serviceResponse == null)
+            {
+                // Handle the case where serviceResponse is null if necessary
+                return new ServiceResponse<Reservation>
+                {
+                    Data = null, // Use default instead of null
+                    Success = false,
+                    Message = "Received a null response from the server"
+                };
+            }
+
+            return serviceResponse;
+        }
 
         public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId)
         {
@@ -67,5 +87,11 @@ namespace GzReservation.Client.Services.ReservationService
 			var result = await _http.GetFromJsonAsync<ServiceResponse<List<int>>>($"api/reservation/{entityId}");
 			return result;
 		}
-	}
+
+        public async Task<ServiceResponse<List<int>>> GetReservationSpotsAsyncNextWeek(int entityId)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<int>>>($"api/Reservation/nextweekspots/{entityId}");
+            return result;
+        }
+    }
 }

@@ -19,6 +19,12 @@ namespace GzReservation.Server.Controllers
             var result = await _reservationService.AddNewReservation(reservationDto);
             return Ok(result);
         }
+        [HttpPost("/nextweek")]
+        public async Task<ActionResult<ServiceResponse<Reservation>>> CreateFormNextWeek(ReservationDto reservationDto)
+        {
+            var result = await _reservationService.AddNewReservationNextWeek(reservationDto);
+            return Ok(result);
+        }
         [HttpGet]
         public async Task<ActionResult<ServiceResponse<List<int>>>> GetFreeSpots()
         {
@@ -31,8 +37,20 @@ namespace GzReservation.Server.Controllers
             var result = await _reservationService.GetFreeSpotsByEntity(entityId);
             return Ok(result);
         }
+        [HttpGet("nextweekspots/{entityId}")]
+        public async Task<ActionResult<ServiceResponse<List<int>>>> GetFreeSpotsPerEntityNextWeek(int entityId)
+        {
+            var result = await _reservationService.GetFreeSpotsByEntityNextWeek(entityId);
+            return Ok(result);
+        }
         [HttpGet("reservations/{entityId}")]
         public async Task<ActionResult<ServiceResponse<List<Reservation>>>>GetReservationsByEntity(int entityId)
+        {
+            var result = await _reservationService.GetReservationByEntity(entityId);
+            return Ok(result);
+        }
+        [HttpGet("reservationsnextweek/{entityId}")]
+        public async Task<ActionResult<ServiceResponse<List<Reservation>>>> GetReservationsByEntityNextWeek(int entityId)
         {
             var result = await _reservationService.GetReservationByEntity(entityId);
             return Ok(result);

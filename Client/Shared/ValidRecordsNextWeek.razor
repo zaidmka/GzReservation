@@ -12,7 +12,7 @@
     <h3>
         حجز الموعد
         (@entityName)
-        للاسبوع الحالي
+        للاسبوع القادم
     </h3>
 
 </div>
@@ -135,35 +135,35 @@ else
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[0] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[0])">
+                        @onclick="() => SelectDay(activeDays[0])">
                             @activeDays[0].ToString("yyyy-MM-dd")
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[1] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[1])">
+                        @onclick="() => SelectDay(activeDays[1])">
                             @activeDays[1].ToString("yyyy-MM-dd")
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[2] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[2])">
+                        @onclick="() => SelectDay(activeDays[2])">
                             @activeDays[2].ToString("yyyy-MM-dd")
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[3] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[3])">
+                        @onclick="() => SelectDay(activeDays[3])">
                             @activeDays[3].ToString("yyyy-MM-dd")
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[4] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[4])">
+                        @onclick="() => SelectDay(activeDays[4])">
                             @activeDays[4].ToString("yyyy-MM-dd")
                         </button>
                     </td>
@@ -225,7 +225,7 @@ else
             <RowTemplate>
                 <MudTd DataLabel="Nr">@(ValidDbaRecords.IndexOf(context) + 1)</MudTd>
 
-                <MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
                     <MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
                     <MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
                     <MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
@@ -248,7 +248,7 @@ else
     private List<PreReservation> ValidDbaRecords = new List<PreReservation>();
     private int selectedRowNumber = -1;
     private MudTable<PreReservation> mudTable;
-    private string name =string.Empty;
+    private string name = string.Empty;
     private string motherName = string.Empty;
     private int docNo;
     private int entity; // remove the 98 in gz office
@@ -316,12 +316,10 @@ else
         }
 
         var today = DateTime.Today;
-        // Calculate the previous or current Sunday depending on the current day
-        var currentSunday = today.AddDays(-(int)today.DayOfWeek);
-
+        var nextSunday = today.AddDays(7 - (int)today.DayOfWeek);
         for (int i = 0; i < 5; i++) // Sunday to Thursday
         {
-            activeDays.Add(currentSunday.AddDays(i));
+            activeDays.Add(nextSunday.AddDays(i));
         }
 
 
@@ -379,7 +377,7 @@ else
 
         if (!resultDialog.Cancelled)
         {
-            if(docNo == 0 ||name==null||entity==null||motherName==null||selectedDay == null || selectedHour == null)
+            if (docNo == 0 || name == null || entity == null || motherName == null || selectedDay == null || selectedHour == null)
             {
                 ReservationMessage = "المعلومات غير كاملة" + "\\" + "الرجاء اختبار التاريخ والوقت والاسم قبل تفعيل الحجز";
                 ShowAlert = true;
@@ -399,7 +397,7 @@ else
                     reservation_hour = selectedHour
                 };
 
-            var result = await ReservationService.AddReservation(NewReservation);
+            var result = await ReservationService.AddReservationNextWeek(NewReservation);
             ReservationMessage = result.Message;
             AddedReservation = result.Data;
             ReservationState = result.Success;
@@ -424,7 +422,7 @@ else
     {
         if (int.TryParse(entityCode, out int entityCodeInt))
         {
-            await LoadValidDbaRecords(entityCodeInt);							// stop to disable oracle connections
+            await LoadValidDbaRecords(entityCodeInt);                           // stop to disable oracle connections
             await LoadReservationSpots(entityCodeInt);
             totalPerEntity = FreeSpots[5];
         }
@@ -451,7 +449,7 @@ else
 
     private async Task LoadReservationSpots(int entityCodeInt)
     {
-        var spotResults = await ReservationService.GetReservationSpotsAsync(entityCodeInt);
+        var spotResults = await ReservationService.GetReservationSpotsAsyncNextWeek(entityCodeInt);
         if (spotResults != null && spotResults.Success)
         {
             FreeSpots = spotResults.Data;

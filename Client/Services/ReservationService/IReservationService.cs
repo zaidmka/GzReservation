@@ -8,6 +8,7 @@ namespace GzReservation.Client.Services.ReservationService
         Task<ServiceResponse<Reservation>> AddReservation(ReservationDto reservationDto);
         Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId);
         Task<ServiceResponse<List<HourAvailability>>> GetReservationByHour(DateOnly reservationDate);
-
+        Task<ServiceResponse<List<int>>> GetReservationSpotsAsyncNextWeek(int entityId);
+        Task<ServiceResponse<Reservation>> AddReservationNextWeek(ReservationDto reservationDto);
     }
 }
