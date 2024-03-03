@@ -52,7 +52,7 @@ namespace GzReservation.Server.Controllers
         [HttpGet("reservationsnextweek/{entityId}")]
         public async Task<ActionResult<ServiceResponse<List<Reservation>>>> GetReservationsByEntityNextWeek(int entityId)
         {
-            var result = await _reservationService.GetReservationByEntity(entityId);
+            var result = await _reservationService.GetReservationByEntityNextWeek(entityId);
             return Ok(result);
         }
 

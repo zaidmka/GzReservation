@@ -620,6 +620,42 @@ namespace GzReservation.Server.Services.ReservationService
         {
             try
             {
+                var today = DateTime.Today;
+                // Calculate the start of the current week
+                var startOfCurrentWeek = today.AddDays((int)DayOfWeek.Sunday - (int)today.DayOfWeek);
+                // Assuming the active week ends on Thursday
+                var endOfCurrentWeek = startOfCurrentWeek.AddDays(4);
+
+                // Convert DateTime to DateOnly for comparison
+                var startOfCurrentWeekDateOnly = DateOnly.FromDateTime(startOfCurrentWeek);
+                var endOfCurrentWeekDateOnly = DateOnly.FromDateTime(endOfCurrentWeek);
+
+
+                var reservations = await _dataContext.reservations
+                        .Where(r => r.reservation_date >= startOfCurrentWeekDateOnly
+                                    && r.reservation_date <= endOfCurrentWeekDateOnly
+                                    && r.EntityId == entityId)
+                        .Include(e => e.Entity)
+                        .ToListAsync();
+
+
+                return new ServiceResponse<List<Reservation>> { Data = reservations, Message = "okay", Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<List<Reservation>>
+                {
+                    Data = null,
+                    Message = $"An error occurred: {ex.Message}",
+                    Success = false
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntityNextWeek(int entityId)
+        {
+            try
+            {
                 // Calculate the start and end of the next active week
                 var today = DateTime.Today;
                 var startOfNextWeek = today.AddDays((int)DayOfWeek.Sunday - (int)today.DayOfWeek + 7);

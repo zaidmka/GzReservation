@@ -65,7 +65,13 @@ namespace GzReservation.Client.Services.ReservationService
             return result;
         }
 
-		public async Task<ServiceResponse<List<HourAvailability>>> GetReservationByHour(DateOnly reservationDate)
+        public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntityNextWeek(int entityId)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<Reservation>>>($"api/reservation/reservationsnextweek/{entityId}");
+            return result;
+        }
+
+        public async Task<ServiceResponse<List<HourAvailability>>> GetReservationByHour(DateOnly reservationDate)
 		{
 			try
 			{

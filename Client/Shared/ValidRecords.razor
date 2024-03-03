@@ -135,35 +135,44 @@ else
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[0] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[0])">
+                                @onclick="() => SelectDay(activeDays[0])"
+                                disabled="@isDateInPastFlags[0]">
                             @activeDays[0].ToString("yyyy-MM-dd")
+
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[1] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[1])">
+                                @onclick="() => SelectDay(activeDays[1])"
+                                disabled="@isDateInPastFlags[1]">
                             @activeDays[1].ToString("yyyy-MM-dd")
+
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[2] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[2])">
+                                @onclick="() => SelectDay(activeDays[2])"
+                                disabled="@isDateInPastFlags[2]">
                             @activeDays[2].ToString("yyyy-MM-dd")
+
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[3] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[3])">
+                                @onclick="() => SelectDay(activeDays[3])"
+                                disabled="@isDateInPastFlags[3]">
                             @activeDays[3].ToString("yyyy-MM-dd")
+
                         </button>
                     </td>
                     <td>
                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[4] ? "btn-danger" : "btn-outline-danger") m-1"
-                                @onclick="() => SelectDay(activeDays[4])">
+                                @onclick="() => SelectDay(activeDays[4])"
+                                disabled="@isDateInPastFlags[4]">
                             @activeDays[4].ToString("yyyy-MM-dd")
                         </button>
                     </td>
@@ -255,6 +264,8 @@ else
     private string entityName = string.Empty;
     private string entityCode = string.Empty;
     private List<DateTime> activeDays = new List<DateTime>();
+    private List<bool> isDateInPastFlags = new List<bool>(); // List to hold flags for each date
+
     private DateTime? selectedDay;
     private List<int> FreeSpots = new List<int>();
     string user = string.Empty;
@@ -316,12 +327,14 @@ else
         }
 
         var today = DateTime.Today;
-        // Calculate the previous or current Sunday depending on the current day
         var currentSunday = today.AddDays(-(int)today.DayOfWeek);
 
         for (int i = 0; i < 5; i++) // Sunday to Thursday
         {
-            activeDays.Add(currentSunday.AddDays(i));
+            var currentDate = currentSunday.AddDays(i);
+            activeDays.Add(currentDate);
+            // Set flag: true if the currentDate is before today, otherwise false
+            isDateInPastFlags.Add(currentDate < today);
         }
 
 
@@ -348,6 +361,25 @@ else
             DateOnly dateOnlyDay = DateOnly.FromDateTime(day);
 
             var response = await ReservationService.GetReservationByHour(dateOnlyDay);
+            if (response.Data != null)
+            {
+                availabilities = response.Data;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception to the console
+            Console.WriteLine($"Error in SelectDay: {ex.Message}");
+            Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
+    }
+    async void SelectDayDate(DateOnly day)
+    {
+        try
+        {
+
+            var response = await ReservationService.GetReservationByHour(day);
             if (response.Data != null)
             {
                 availabilities = response.Data;
@@ -403,6 +435,8 @@ else
             ReservationMessage = result.Message;
             AddedReservation = result.Data;
             ReservationState = result.Success;
+            SelectDayDate(DateOnly.FromDateTime(selectedDay.GetValueOrDefault()));
+            
         }
         else
         {

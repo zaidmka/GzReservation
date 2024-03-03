@@ -13,6 +13,8 @@ namespace GzReservation.Server.Services.ReservationService
         Task<ServiceResponse<List<int>>> GetFreeSpots();
         Task<ServiceResponse<List<int>>> GetFreeSpotsByEntity(int entityId);
         Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId);
+        Task<ServiceResponse<List<Reservation>>> GetReservationByEntityNextWeek(int entityId);
+
         Task<ServiceResponse<List<HourAvailability>>> GetReservationHourByDay(DateOnly reservationDate);
         Task<ServiceResponse<Reservation>> AddNewReservationNextWeek(ReservationDto reservationDto);
 
