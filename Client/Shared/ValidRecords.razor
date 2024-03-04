@@ -189,11 +189,30 @@ else
                     <tr>
                         @foreach (var availability in availabilities)
                         {
+
+                            // Convert availability.Hour into components for comparison
+                            var timeParts = availability.Hour.EndsWith("am") ?
+                            availability.Hour.Replace(" am", "").Split(':').Select(int.Parse).ToArray() :
+                            availability.Hour.Replace(" pm", "").Split(':').Select((part, index) => index == 0 ? (int.Parse(part) % 12) + 12 : int.Parse(part)).ToArray();
+
+                            var availabilityTime = new TimeSpan(timeParts[0], timeParts[1], 0);
+
+                            // Get current system time
+                            var now = DateTime.Now.TimeOfDay;
+
                             // Determine the button class based on whether this hour is the selected hour
                             var btnClass = availability.Hour == selectedHour ? "btn btn-danger" : "btn btn-outline-danger";
-                            // Determine if the button should be disabled based on available spots
-                            var isDisabled = availability.AvailableSpots <= 0;
 
+                            // Determine if the button should be disabled based on available spots or if the time has passed
+                            bool isDisabled;
+                            if (selectedDay == DateTime.Today)
+                            {
+                                isDisabled = availability.AvailableSpots <= 0 || availabilityTime <= now;
+                            }
+                            else
+                            {
+                                isDisabled = availability.AvailableSpots <= 0;
+                            }
                             <th>
                                 <button style="font-weight:800;" class="@btnClass" @onclick="isDisabled ? null : (() => SetSelectedHour(availability.Hour))" disabled="@isDisabled">
                                     @availability.Hour <br> (@availability.AvailableSpots)
