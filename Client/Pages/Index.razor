@@ -11,89 +11,93 @@
 
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
-    <Authorized>
-        @if (newUser == "yes")
-        {
-            <Firstlogin />
+	<Authorized>
+		@if (newUser == "yes")
+		{
+			<Firstlogin />
 
-        }
+		}
 
-        else
-        {
-            <div style="font-family:Cairo; height:1000px;">
+		else
+		{
+			<div style="font-family:Cairo; height:1000px;">
 
-                <div class="center-div">
-                    <h2>قسم اصدار هويات المنطقة الخضراء</h2>
-                    <h2>اللجنة الامنية</h2>
-                    <h4>نظام الحجز الالكتروني للمقابلات الامنية</h4>
-                </div>
-                <div class="center-content">
-                    <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="400" height="400" alt="Menu Icon" />
-                    <h4 style="font-family:Cairo">
-                        اهلا وسهلا سيد (@fullname) في النظام
-                    </h4>
-                    <h4 style="font-family:Cairo">
-                        مخول (@entityName)
-                    </h4>
-                </div>
+				<div class="center-div">
+					<h2>قسم اصدار هويات المنطقة الخضراء</h2>
+					<h2>اللجنة الامنية</h2>
+					<h4>نظام الحجز الالكتروني للمقابلات الامنية</h4>
+				</div>
+				<div class="center-content">
+					<img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="400" height="400" alt="Menu Icon" />
+					<h4 style="font-family:Cairo">
+						اهلا وسهلا سيد (@fullname) في النظام
+					</h4>
+					<h4 style="font-family:Cairo">
+						مخول (@entityName)
+					</h4>
+				</div>
+				<div>
+					<span style="color:red;font-weight:800;">
+						 تحديث 1.1 (10/03/2024): تم اضافة البحث عن الاسم في حجز الاسبوع الحالي والقادم... لإلغاء البحث امسح الاسم واضغط (enter)
+					</span>
+				</div>
 
+			</div>
+		}
 
-            </div>
-        }
+		@email
+		<br />
+		@entitycode
 
-        @email
-        <br />
-        @entitycode
-
-    </Authorized>
-    <NotAuthorized>
-        <div class="center-content">
-            <img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
-            <h4 style="font-family:Cairo">
-                الرجاء تسجيل
-                <a href="login">الدخول  <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Info" Size="Size.Medium" /> </a>
-                لغرض المحتوى
-            </h4>
-            <h4 style="font-family:Cairo;color:red">
-                النظام خاص بقسم اصدار هويات دخول المنطقة الخضراء, يمسح بالدخول للاشخاص المخولين فقط
-            </h4>
-        </div>
-    </NotAuthorized>
+	</Authorized>
+	<NotAuthorized>
+		<div class="center-content">
+			<img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
+			<h4 style="font-family:Cairo">
+				الرجاء تسجيل
+				<a href="login">الدخول  <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Info" Size="Size.Medium" /> </a>
+				لغرض المحتوى
+			</h4>
+			<h4 style="font-family:Cairo;color:red">
+				النظام خاص بقسم اصدار هويات دخول المنطقة الخضراء, يمسح بالدخول للاشخاص المخولين فقط
+			</h4>
+		</div>
+	</NotAuthorized>
 </AuthorizeView>
 @code {
 
-    public string message = "";
-    string fullname = string.Empty;
-    string entityName = string.Empty;
-    string newUser = string.Empty;
-    string email = string.Empty;
-    int entitycode;
+	public string message = "";
+	string fullname = string.Empty;
+	string entityName = string.Empty;
+	string newUser = string.Empty;
+	string email = string.Empty;
+	int entitycode;
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        email = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-        if (email == null)
-        {
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		email = authState?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+		if (email == null)
+		{
 
-        }
-        else
-        {
-            var result = await AuthService.GetUserInfo(email);
-            if (result.Data == null) { }
-            else
-            {
-                fullname = result.Data.fullname;
-               entityName = result.Data.Entity.entity_name;
-                entitycode = result.Data.Entity.id;
-                newUser = result.Data.new_user;
-                StateHasChanged();
-            }
-        }
+		}
+		else
+		{
+			var result = await AuthService.GetUserInfo(email);
+			if (result.Data == null) { }
+			else
+			{
+				fullname = result.Data.fullname;
+				entityName = result.Data.Entity.entity_name;
+				entitycode = result.Data.Entity.id;
+				newUser = result.Data.new_user;
+				StateHasChanged();
+			}
+		}
 
 
-    }
+	}
 
 
 
