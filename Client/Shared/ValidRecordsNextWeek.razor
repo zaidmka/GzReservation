@@ -211,7 +211,13 @@ else
     <hr />
     <div class="custom-table">
         <MudTable T="PreReservation" Items="@ValidDbaRecords" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
-                  RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader">
+                  RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader"
+                  Filter="new Func<PreReservation,bool>(FilterFunc1)">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">ابحث عن الاسم</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
             <HeaderContent>
                 <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">التسلسل</MudTh>
 
@@ -267,7 +273,20 @@ else
     private int totalPerEntity;
     private List<HourAvailability> availabilities = new List<HourAvailability>();
     private string selectedHour = string.Empty;
+    private string searchString1 = "";
+    private bool FilterFunc1(PreReservation element) => FilterFunc(element, searchString1);
 
+
+    private bool FilterFunc(PreReservation element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.full_name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
 
     private void RowClickEvent(TableRowClickEventArgs<PreReservation> tableRowClickEventArgs)
     {
