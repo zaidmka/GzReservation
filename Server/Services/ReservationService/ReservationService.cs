@@ -36,7 +36,7 @@ namespace GzReservation.Server.Services.ReservationService
                     // Check global daily limit
                     const int maxReservationsPerDayGlobal = 100;
                     int totalReservationsForDay = await _dataContext.reservations
-                        .Where(r => r.reservation_date == reservationDto.reservation_date)
+                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.state == true)
                         .CountAsync();
 
                     if (totalReservationsForDay >= maxReservationsPerDayGlobal)
@@ -80,7 +80,7 @@ namespace GzReservation.Server.Services.ReservationService
                     }
                     // Retrieve and count reservations for the same EntityId and date
                     int reservationsCountForDay = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date == reservationDto.reservation_date)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date == reservationDto.reservation_date && r.state == true)
                         .CountAsync();
 
                     // Compare the count to max_day
@@ -95,7 +95,7 @@ namespace GzReservation.Server.Services.ReservationService
                     }
                     //check the doc_no is not repeated for the next week reservation
                     int DocNoCount = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfCurrentWeekDateOnly && r.reservation_date <= endOfCurrentWeekDateOnly && r.doc_no == reservationDto.doc_no)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfCurrentWeekDateOnly && r.reservation_date <= endOfCurrentWeekDateOnly && r.doc_no == reservationDto.doc_no && r.state == true)
                         .CountAsync();
                     if (DocNoCount >= 1)
                     {
@@ -108,7 +108,7 @@ namespace GzReservation.Server.Services.ReservationService
                     }
                     // Retrieve the count of reservations for the same EntityId for the next active week
                     int reservationsCountForWeek = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfCurrentWeekDateOnly && r.reservation_date <= endOfCurrentWeekDateOnly)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfCurrentWeekDateOnly && r.reservation_date <= endOfCurrentWeekDateOnly && r.state == true)
                         .CountAsync();
 
                     // Compare the count to max_week
@@ -136,7 +136,7 @@ namespace GzReservation.Server.Services.ReservationService
 
                     }
                     int reservationHourCount = await _dataContext.reservations
-                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour==reservationDto.reservation_hour)
+                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour==reservationDto.reservation_hour && r.state == true)
                         .CountAsync();
                     if (reservationHourCount >= activehour.max)
                     {
@@ -221,7 +221,7 @@ namespace GzReservation.Server.Services.ReservationService
                     // Check global daily limit
                     const int maxReservationsPerDayGlobal = 100;
                     int totalReservationsForDay = await _dataContext.reservations
-                        .Where(r => r.reservation_date == reservationDto.reservation_date)
+                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.state == true)
                         .CountAsync();
 
                     if (totalReservationsForDay >= maxReservationsPerDayGlobal)
@@ -256,7 +256,7 @@ namespace GzReservation.Server.Services.ReservationService
 
                     // Retrieve and count reservations for the same EntityId and date
                     int reservationsCountForDay = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date == reservationDto.reservation_date)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date == reservationDto.reservation_date && r.state == true)
                         .CountAsync();
 
                     // Compare the count to max_day
@@ -271,7 +271,7 @@ namespace GzReservation.Server.Services.ReservationService
                     }
                     //check the doc_no is not repeated for the next week reservation
                     int DocNoCount = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly && r.doc_no == reservationDto.doc_no)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly && r.doc_no == reservationDto.doc_no && r.state == true)
                         .CountAsync();
                     if (DocNoCount >= 1)
                     {
@@ -284,7 +284,7 @@ namespace GzReservation.Server.Services.ReservationService
                     }
                     // Retrieve the count of reservations for the same EntityId for the next active week
                     int reservationsCountForWeek = await _dataContext.reservations
-                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly)
+                        .Where(r => r.EntityId == entity.id && r.reservation_date >= startOfNextWeekDateOnly && r.reservation_date <= endOfNextWeekDateOnly && r.state == true)
                         .CountAsync();
 
                     // Compare the count to max_week
@@ -312,7 +312,7 @@ namespace GzReservation.Server.Services.ReservationService
 
                     }
                     int reservationHourCount = await _dataContext.reservations
-                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour == reservationDto.reservation_hour)
+                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour == reservationDto.reservation_hour && r.state == true)
                         .CountAsync();
                     if (reservationHourCount >= activehour.max)
                     {
@@ -404,7 +404,7 @@ namespace GzReservation.Server.Services.ReservationService
                     {
                         // Count the reservations for the day
                         int reservationsCountForDay = await _dataContext.reservations
-                            .Where(r => r.reservation_date == date)
+                            .Where(r => r.reservation_date == date && r.state == true)
                             .CountAsync();
 
                         // Calculate free spots (considering the global limit)
@@ -467,7 +467,7 @@ namespace GzReservation.Server.Services.ReservationService
                     {
                         // Count the reservations for the day
                         int reservationsCountForDay = await _dataContext.reservations
-                            .Where(r => r.reservation_date == date && r.EntityId == entityId)
+                            .Where(r => r.reservation_date == date && r.EntityId == entityId && r.state == true)
                             .CountAsync();
 
                         // Update the total reservations for the week
@@ -554,7 +554,7 @@ namespace GzReservation.Server.Services.ReservationService
                     {
                         // Count the reservations for the day
                         int reservationsCountForDay = await _dataContext.reservations
-                            .Where(r => r.reservation_date == date && r.EntityId == entityId)
+                            .Where(r => r.reservation_date == date && r.EntityId == entityId && r.state == true)
                             .CountAsync();
 
                         // Update the total reservations for the week
@@ -634,7 +634,7 @@ namespace GzReservation.Server.Services.ReservationService
                 var reservations = await _dataContext.reservations
                         .Where(r => r.reservation_date >= startOfCurrentWeekDateOnly
                                     && r.reservation_date <= endOfCurrentWeekDateOnly
-                                    && r.EntityId == entityId)
+                                    && r.EntityId == entityId && r.state == true)
                         .Include(e => e.Entity)
                         .ToListAsync();
 
@@ -668,7 +668,7 @@ namespace GzReservation.Server.Services.ReservationService
                 var reservations = await _dataContext.reservations
                         .Where(r => r.reservation_date >= startOfNextWeekDateOnly
                                     && r.reservation_date <= endOfNextWeekDateOnly
-                                    && r.EntityId == entityId)
+                                    && r.EntityId == entityId && r.state == true)
                         .Include(e => e.Entity)
                         .ToListAsync();
 
@@ -702,7 +702,7 @@ namespace GzReservation.Server.Services.ReservationService
                 // Find reservations for this hour on the given day
                 var reservationsCount = await _dataContext.reservations
                     .CountAsync(r => r.reservation_date == reservationDate &&
-                                     r.reservation_hour == activeHour.hour); 
+                                     r.reservation_hour == activeHour.hour && r.state == true); 
 
                 // Calculate available spots
                 int availableSpots = activeHour.max - reservationsCount;
