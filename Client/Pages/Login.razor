@@ -19,9 +19,10 @@
 <div style="font-family:Cairo;" class="d-flex justify-content-center">
     <h3>تسجيل الدخول</h3>
 </div>
+
 <EditForm Model="user" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
-    <div style="font-family:Cairo;font-weight:bold;font-size:16px; min-height: 100vh;" class="d-flex justify-content-center">
+    <div style="font-family:Cairo;font-weight:bold;font-size:16px;" class="d-flex justify-content-center">
         <div class="col-md-4 mb-3">
 
             <label for="email">الحساب</label>
@@ -37,13 +38,18 @@
 
     </div>
 </EditForm>
+@if (state)
+{
+    <div class="center-content">
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 
-
+    </div>
+}
 @code {
     private UserLogin user = new UserLogin();
 
     private string errorMessage = string.Empty;
-
+    private bool state = false;
     private string returnUrl = string.Empty;
     bool check = true;
 
@@ -58,6 +64,8 @@
 
     private async Task HandleLogin()
     {
+        state = true;
+        StateHasChanged();
         var result = await AuthService.Login(user);
         if (result.Success)
         {
@@ -75,6 +83,7 @@
         {
             errorMessage = result.Message;
             check = false;
+            state = true;
         }
     }
 }

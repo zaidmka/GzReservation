@@ -1,4 +1,6 @@
-﻿namespace GzReservation.Server.Services.AuthService
+﻿using GzReservation.Client.Pages;
+
+namespace GzReservation.Server.Services.AuthService
 {
     public interface IAuthService
     {
@@ -13,6 +15,7 @@
         string GetUserEmail();
 
         Task<ServiceResponse<UserEntity>> GetUserByEmail(string email);
+        Task<ServiceResponse<UserEntityChangeDetails>> ChangeUserName(UserEntityChangeDetails userEntityChange);
 
     }
 }

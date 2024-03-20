@@ -1,0 +1,93 @@
+﻿@page "/admin/entity/profile"
+
+@inject IAuthService AuthService
+@attribute [Authorize]
+    @if (ShowAlert)
+{
+
+	@if (ChangeState)
+	{
+		<MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="(() => CloseMe(false))">
+			Done! <span>@message</span> - login:>> <span>@email</span> - Full Name: <span>@FullName</span> - EntityCode: @EntityId
+		</MudAlert>
+
+	}
+	else
+	{
+		<MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="(() => CloseMe(false))">
+			Error! - <span>@message</span>
+		</MudAlert>
+
+	}
+}
+<AuthorizeView>
+
+	<div class="d-flex justify-content-center">
+		<img src="/logomedium.png" style="width:200px;" />
+	</div>
+	<div style="font-family:Cairo;" class="d-flex justify-content-center">
+		<h3>تغيير اسم المستخدم</h3>
+	</div>
+</AuthorizeView>
+
+<EditForm Model="request" OnValidSubmit="ChangeUserFullName">
+	<div style="font-family:Cairo;font-weight:bold;font-size:16px;" class="d-flex justify-content-center">
+		<div class="col-md-4 mb-3">
+
+			<div class="mb-3">
+				<label for="email">حساب الدخول</label>
+				<InputText id="email" @bind-Value="request.Email" class="form-control" />
+			</div>
+			<div class="mb-3">
+				<label for="email">الاسم الكامل</label>
+				<InputText id="email" @bind-Value="request.fullname" class="form-control" />
+			</div>
+			<div class="mb-3">
+				<label for="email">رمز الجهة</label>
+				<InputNumber id="email" @bind-Value="request.EntityId" class="form-control" />
+			</div>
+			<button type="submit" class="btn btn-primary">تغيير</button>
+		</div>
+	</div>
+</EditForm>
+@if (state)
+{
+	<div style="font-family:Cairo;font-weight:bold;font-size:16px;" class="d-flex justify-content-center">
+
+		<div class="center-content">
+			<MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+
+		</div>
+	</div>
+}
+
+@code {
+	UserEntityChangeDetails request = new UserEntityChangeDetails();
+	string message = string.Empty;
+	bool ShowAlert;
+	bool ChangeState;
+	string FullName = string.Empty;
+	int EntityId;
+	string email = string.Empty;
+	private bool state = false;
+
+	private async Task ChangeUserFullName()
+	{
+		state = true;
+		var result = await AuthService.UserChangeDetails(request);
+		if (result.Success = true)
+		{
+			FullName = result.Data.fullname;
+			EntityId = result.Data.EntityId;
+			email = result.Data.Email;
+			state = false;
+		}
+		message = result.Message;
+		ChangeState = result.Success;
+		ShowAlert = true;
+	}
+	private void CloseMe(bool value)
+	{
+		ShowAlert = false;
+	}
+}

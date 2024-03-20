@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GzReservation.Client.Pages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -201,6 +202,28 @@ namespace GzReservation.Server.Services.AuthService
 
             return new ServiceResponse<bool> { Data = true, Message = "تم تغيير المعلومات بنجاح.", Success = true };
         }
-    }
+
+		public async Task<ServiceResponse<UserEntityChangeDetails>> ChangeUserName(UserEntityChangeDetails userEntityChange)
+		{
+			var response = await _context.usersentity
+                .Where(u=>u.Email == userEntityChange.Email)
+                .FirstOrDefaultAsync();
+            if(response == null)
+            {
+                return new ServiceResponse<UserEntityChangeDetails>
+                {
+                    Data = null,
+                    Success = false,
+                    Message = "User Not Found"
+                };
+            }
+
+            //response.EntityId = userEntityChange.EntityId;
+            response.fullname = userEntityChange.fullname;
+            //response.new_user = userEntityChange.state;
+            await _context.SaveChangesAsync();
+            return new ServiceResponse<UserEntityChangeDetails> { Data=userEntityChange, Success = true,Message="okay" };
+		}
+	}
 
 }

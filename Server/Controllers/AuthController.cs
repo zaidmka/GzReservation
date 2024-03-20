@@ -119,5 +119,20 @@ public class AuthController : ControllerBase
         var result = await _authService.GetUserByEmail(userEmail);
         return Ok(result);
     }
+	[HttpPost("changeUserEntityName")]
+	[Authorize(Policy = "AdminRolePolicy")] // Only the register action is under the AdminRolePolicy
+	public async Task<ActionResult<ServiceResponse<UserEntityChangeDetails>>> ChangeUserEntityName(UserEntityChangeDetails userEntityChangeName)
+	{
+		var result = await _authService.ChangeUserName(userEntityChangeName);
+		if (result.Success)
+		{
+			return Ok(result); // Return 200 OK for successful operation
+		}
+		else
+		{
+			return BadRequest(result); // Return 400 Bad Request for failed operation
+		}
+	}
+
 
 }

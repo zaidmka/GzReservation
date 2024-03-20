@@ -1,4 +1,5 @@
 ﻿using GzReservation.Shared;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Net.Http.Json;
 
 namespace GzReservation.Client.Services.AuthService
@@ -42,5 +43,11 @@ namespace GzReservation.Client.Services.AuthService
             var result = await _http.PostAsJsonAsync("api/auth/register", request);
             return await result.Content.ReadFromJsonAsync<ServiceResponse<int>>();
         }
-    }
+
+		public async Task<ServiceResponse<UserEntityChangeDetails>> UserChangeDetails(UserEntityChangeDetails userEntityChange)
+		{
+			var result = await _http.PostAsJsonAsync("api/auth/changeUserEntityName", userEntityChange);
+			return await result.Content.ReadFromJsonAsync<ServiceResponse<UserEntityChangeDetails>>();
+		}
+	}
 }
