@@ -169,12 +169,12 @@ else
                         </button>
                     </td>
                     <td>
-                        <button type="button" style="font-weight:800;"
+                         <button type="button" style="font-weight:800;"
                                 class="btn @(selectedDay == activeDays[4] ? "btn-danger" : "btn-outline-danger") m-1"
                                 @onclick="() => SelectDay(activeDays[4])"
                                 disabled="@isDateInPastFlags[4]">
                             @activeDays[4].ToString("yyyy-MM-dd")
-                        </button>
+                        </button> 
                     </td>
                 </tr>
             </tbody>
