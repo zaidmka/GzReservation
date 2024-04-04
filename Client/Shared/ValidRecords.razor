@@ -477,7 +477,7 @@ else
 			ReservationState = result.Success;
 			if (result.Success)
 			{
-				var responseMessage = MessageService.SendMessageReservationAsync(NewReservation.doc_no, NewReservation.reservation_date.ToString(), NewReservation.reservation_hour);
+				var responseMessage = MessageService.SendMessageReservationAsync(NewReservation.doc_no, NewReservation.reservation_date.ToString("dd/MM/yyyy"), NewReservation.reservation_hour);
 			}
 			SelectDayDate(DateOnly.FromDateTime(selectedDay.GetValueOrDefault()));
 
