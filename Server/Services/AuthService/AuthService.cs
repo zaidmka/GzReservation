@@ -218,7 +218,7 @@ namespace GzReservation.Server.Services.AuthService
                 };
             }
 
-            //response.EntityId = userEntityChange.EntityId;
+            response.EntityId = userEntityChange.EntityId;
             response.fullname = userEntityChange.fullname;
             //response.new_user = userEntityChange.state;
             await _context.SaveChangesAsync();

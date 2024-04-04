@@ -7,6 +7,7 @@
 @using System.Security.Claims
 @inject IDialogService DialogService
 @inject IAuthService AuthService
+@inject IMessageService MessageService
 
 <div class="center-div">
     <h3>
@@ -240,6 +241,7 @@ else
                 </RowTemplate>
             </MudTable>
         </div>
+   
 
 }
 
@@ -275,7 +277,8 @@ else
     private string selectedHour = string.Empty;
     private string searchString1 = "";
     private bool FilterFunc1(PreReservation element) => FilterFunc(element, searchString1);
-
+    private bool MessageState;
+    private string messagetext = string.Empty;
 
     private bool FilterFunc(PreReservation element, string searchString)
     {
@@ -420,6 +423,12 @@ else
             ReservationMessage = result.Message;
             AddedReservation = result.Data;
             ReservationState = result.Success;
+            if (result.Success)
+            {
+                var responseMessage = MessageService.SendMessageReservationAsync(NewReservation.doc_no, NewReservation.reservation_date.ToString(), NewReservation.reservation_hour);
+               // MessageState = responseMessage.Success;
+              //  messagetext = responseMessage.Message;
+            }
         }
         else
         {
