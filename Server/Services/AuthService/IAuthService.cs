@@ -17,5 +17,7 @@ namespace GzReservation.Server.Services.AuthService
         Task<ServiceResponse<UserEntity>> GetUserByEmail(string email);
         Task<ServiceResponse<UserEntityChangeDetails>> ChangeUserName(UserEntityChangeDetails userEntityChange);
 
-    }
+		Task<ServiceResponse<bool>> ChangePasswordAdmin(UserLogin request);
+
+	}
 }

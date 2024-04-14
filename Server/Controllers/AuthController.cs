@@ -134,5 +134,18 @@ public class AuthController : ControllerBase
 		}
 	}
 
+	[HttpPost("AdminChangePassword")]
+	[Authorize(Policy = "AdminRolePolicy")] // Only the register action is under the AdminRolePolicy
+	public async Task<ActionResult<ServiceResponse<bool>>> ChangePasswordAdmin(UserLogin user)
+	{
+		
+		var response = await _authService.ChangePasswordAdmin(user);
 
+		if (!response.Success)
+		{
+			return BadRequest(response);
+		}
+
+		return Ok(response);
+	}
 }

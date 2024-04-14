@@ -1,4 +1,5 @@
 ﻿using GzReservation.Client.Pages;
+using GzReservation.Server.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -223,6 +224,28 @@ namespace GzReservation.Server.Services.AuthService
             //response.new_user = userEntityChange.state;
             await _context.SaveChangesAsync();
             return new ServiceResponse<UserEntityChangeDetails> { Data=userEntityChange, Success = true,Message="okay" };
+		}
+
+		public async Task<ServiceResponse<bool>> ChangePasswordAdmin(UserLogin request)
+		{
+			var user = await _context.usersentity.FirstOrDefaultAsync(u => u.Email == request.Email);
+			if (user == null)
+			{
+				return new ServiceResponse<bool>
+				{
+					Success = false,
+					Message = "User not found."
+				};
+			}
+
+			CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+			user.PasswordHash = passwordHash;
+			user.PasswordSalt = passwordSalt;
+
+			await _context.SaveChangesAsync();
+
+			return new ServiceResponse<bool> { Data = true, Message = "Password has been changed.",Success=true };
 		}
 	}
 
