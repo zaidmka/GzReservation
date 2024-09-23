@@ -48,6 +48,12 @@ else
                     @totalPerEntity
                 } )
             </span>
+            الحد اليومي المسموح
+            <span style="color:red">
+                (
+                @dailyLimit
+                )
+            </span>
         </h4>
 
     </div>
@@ -279,7 +285,17 @@ else
     private bool FilterFunc1(PreReservation element) => FilterFunc(element, searchString1);
     private bool MessageState;
     private string messagetext = string.Empty;
+    private string dailyLimit = string.Empty;
 
+
+
+
+    async void GetDailyLimit()
+    {
+        var response = await ReservationService.GetDailyLimitbyEntity(int.Parse(entityCode));
+        dailyLimit = response.Data.ToString();
+        StateHasChanged();
+    }
     private bool FilterFunc(PreReservation element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
@@ -348,7 +364,7 @@ else
         state = false;
         await LoadDataAndSpots();
 
-
+        GetDailyLimit();
 
 
     }
@@ -423,11 +439,12 @@ else
             ReservationMessage = result.Message;
             AddedReservation = result.Data;
             ReservationState = result.Success;
+            //Reservation Messages
+
             if (result.Success)
             {
-                var responseMessage = MessageService.SendMessageReservationAsync(NewReservation.doc_no, NewReservation.reservation_date.ToString("dd/MM/yyyy"), NewReservation.reservation_hour);
-               // MessageState = responseMessage.Success;
-              //  messagetext = responseMessage.Message;
+                //var responseMessage = MessageService.SendMessageReservationAsync(NewReservation.doc_no, NewReservation.reservation_date.ToString("dd/MM/yyyy"), NewReservation.reservation_hour);
+               
             }
         }
         else
@@ -438,7 +455,7 @@ else
         }
         ShowAlert = true;
         await LoadDataAndSpots();
-
+        GetDailyLimit();
         StateHasChanged();
     }
 

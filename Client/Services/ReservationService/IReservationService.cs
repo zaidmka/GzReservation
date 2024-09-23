@@ -12,5 +12,6 @@ namespace GzReservation.Client.Services.ReservationService
         Task<ServiceResponse<List<HourAvailability>>> GetReservationByHour(DateOnly reservationDate);
         Task<ServiceResponse<List<int>>> GetReservationSpotsAsyncNextWeek(int entityId);
         Task<ServiceResponse<Reservation>> AddReservationNextWeek(ReservationDto reservationDto);
+        Task<ServiceResponse<int>>GetDailyLimitbyEntity(int entityId);
     }
 }

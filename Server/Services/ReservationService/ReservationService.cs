@@ -78,6 +78,23 @@ namespace GzReservation.Server.Services.ReservationService
                             Success = false
                         };
                     }
+
+                    //Add daily limit for entity to add a reservations
+
+                    int reservationCountPerToday = await _dataContext.reservations
+                        .Where(r => r.action_date.Date == today && r.EntityId == reservationDto.EntityId && r.state == true)
+                        .CountAsync();
+
+                    if (reservationCountPerToday >= (entity.max_day * 2))
+                    {
+                        return new ServiceResponse<Reservation>
+                        {
+                            Data = null,
+                            Message = "تم تجاوز العدد اليومي المقرر للحجز,الرجاء المحاولة غداً",
+                            Success = false
+                        };
+                    }
+
                     // Retrieve and count reservations for the same EntityId and date
                     int reservationsCountForDay = await _dataContext.reservations
                         .Where(r => r.EntityId == entity.id && r.reservation_date == reservationDto.reservation_date && r.state == true)
@@ -136,7 +153,7 @@ namespace GzReservation.Server.Services.ReservationService
 
                     }
                     int reservationHourCount = await _dataContext.reservations
-                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour==reservationDto.reservation_hour && r.state == true)
+                        .Where(r => r.reservation_date == reservationDto.reservation_date && r.reservation_hour == reservationDto.reservation_hour && r.state == true)
                         .CountAsync();
                     if (reservationHourCount >= activehour.max)
                     {
@@ -253,6 +270,23 @@ namespace GzReservation.Server.Services.ReservationService
                             Success = false
                         };
                     }
+
+                    //Add daily limit for entity to add a reservations
+
+                    int reservationCountPerToday = await _dataContext.reservations
+                        .Where(r => r.action_date.Date == today && r.EntityId == reservationDto.EntityId && r.state == true)
+                        .CountAsync();
+
+                    if (reservationCountPerToday >= (entity.max_day * 2))
+                    {
+                        return new ServiceResponse<Reservation>
+                        {
+                            Data = null,
+                            Message = "تم تجاوز العدد اليومي المقرر للحجز,الرجاء المحاولة غداً",
+                            Success = false
+                        };
+                    }
+
 
                     // Retrieve and count reservations for the same EntityId and date
                     int reservationsCountForDay = await _dataContext.reservations
@@ -376,6 +410,25 @@ namespace GzReservation.Server.Services.ReservationService
         public Task<ServiceResponse<Reservation>> DeleteReservation(int reservationId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ServiceResponse<int>> GetDaliyLimitPerEntity(int entityId)
+        {
+            try
+            {
+                var today = DateTime.Today;
+
+                int reservationCountToday = await _dataContext.reservations
+                    .Where(r => r.action_date.Date == today && r.EntityId == entityId && r.state == true)
+                    .CountAsync();
+                int entityDailyLimit = await _dataContext.entities.Where(r => r.id == entityId).Select(r=>r.max_day).FirstOrDefaultAsync();
+
+                return new ServiceResponse<int> { Data = (2*entityDailyLimit)-reservationCountToday, Message = "Okay", Success = true };
+            }
+            catch (DbUpdateException ex)
+            {
+                return new ServiceResponse<int> { Data = 1110, Message = ex.ToString(), Success = false };
+            }
         }
 
         public async Task<ServiceResponse<List<int>>> GetFreeSpots()
@@ -609,9 +662,9 @@ namespace GzReservation.Server.Services.ReservationService
             }
         }
 
-    
 
-    public Task<ServiceResponse<Reservation>> GetReservation(int reservationId)
+
+        public Task<ServiceResponse<Reservation>> GetReservation(int reservationId)
         {
             throw new NotImplementedException();
         }
@@ -692,7 +745,7 @@ namespace GzReservation.Server.Services.ReservationService
 
             // Retrieve all active hours
             var activeHours = await _dataContext.activehours
-                .OrderBy(ah=>ah.id)
+                .OrderBy(ah => ah.id)
                 .ToListAsync();
 
             // List to store availability for each hour
@@ -702,7 +755,7 @@ namespace GzReservation.Server.Services.ReservationService
                 // Find reservations for this hour on the given day
                 var reservationsCount = await _dataContext.reservations
                     .CountAsync(r => r.reservation_date == reservationDate &&
-                                     r.reservation_hour == activeHour.hour && r.state == true); 
+                                     r.reservation_hour == activeHour.hour && r.state == true);
 
                 // Calculate available spots
                 int availableSpots = activeHour.max - reservationsCount;
@@ -715,7 +768,7 @@ namespace GzReservation.Server.Services.ReservationService
                 });
             }
 
-            if(availabilityList.Count > 0)
+            if (availabilityList.Count > 0)
             {
                 return new ServiceResponse<List<HourAvailability>>
                 {

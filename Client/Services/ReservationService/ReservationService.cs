@@ -58,6 +58,12 @@ namespace GzReservation.Client.Services.ReservationService
 
             return serviceResponse;
         }
+        
+        public async Task<ServiceResponse<int>> GetDailyLimitbyEntity(int entityId)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<int>>($"api/Reservation/dailylimit/{entityId}");
+            return result;
+        }
 
         public async Task<ServiceResponse<List<Reservation>>> GetReservationByEntity(int entityId)
         {

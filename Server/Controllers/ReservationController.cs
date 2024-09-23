@@ -62,7 +62,12 @@ namespace GzReservation.Server.Controllers
             var result = await _reservationService.GetReservationHourByDay(reservationDate);
             return Ok(result);
         }
-
+        [HttpGet("dailylimit/{entityId}")]
+        public async Task<ActionResult<ServiceResponse<int>>>GetDailyReservationLimitPerEntity(int entityId)
+        {
+            var result = await _reservationService.GetDaliyLimitPerEntity(entityId);
+            return Ok(result);
+        }
 
     }
 }
