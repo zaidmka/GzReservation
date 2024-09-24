@@ -28,6 +28,7 @@ namespace GzReservation.Server.Data
         public DbSet<Reservation> reservations { get; set; }
         public DbSet<ActiveHour> activehours { get; set; }
 
+        public DbSet<Dbmessage> messages { get; set; }
 
 
     }

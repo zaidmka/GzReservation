@@ -15,6 +15,7 @@ global using GzReservation.Server.DTOs;
 global using GzReservation.Server.Data;
 global using GzReservation.Server.Services.TestService;
 global using GzReservation.Server.Services.ReservationService;
+global using GzReservation.Server.Services.AnnouncementService;
 
 using Microsoft.AspNetCore.Builder;
 
@@ -23,7 +24,6 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
@@ -40,6 +40,7 @@ builder.Services.AddScoped<IOracleService, OracleService>();
 builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IEntityService, EntityService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
