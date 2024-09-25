@@ -38,5 +38,11 @@ namespace GzReservation.Server.Controllers
             var result = await _announcementService.DeleteDbMessageAsync(dbmessageId);
             return Ok(result);
         }
-    }
+		[HttpGet("active")]
+		public async Task<ActionResult<ServiceResponse<List<Dbmessage>>>> GetActiveDbMessage()
+		{
+			var result = await _announcementService.GetActiveDbMessagesListAsync();
+			return Ok(result);
+		}
+	}
 }

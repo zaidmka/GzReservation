@@ -5,6 +5,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISecurityFormService SecurityFormService
 @inject IAuthService AuthService
+@inject IAnnouncementService AnnouncementService
 
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
@@ -20,7 +21,7 @@
 
 		else
 		{
-			<div style="font-family:Cairo; height:1000px;">
+			<div style="font-family:Cairo;">
 
 				<div class="center-div">
 					<h2>قسم اصدار هويات المنطقة الخضراء</h2>
@@ -28,7 +29,7 @@
 					<h4>نظام الحجز الالكتروني للمقابلات الامنية</h4>
 				</div>
 				<div class="center-content">
-					<img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="400" height="400" alt="Menu Icon" />
+					<img class="fade-in-out" src="/Coat_of_arms_of_Iraq.svg" width="300" height="300" alt="Menu Icon" />
 					<h4 style="font-family:Cairo">
 						اهلا وسهلا سيد (@fullname) في النظام
 					</h4>
@@ -36,17 +37,10 @@
 						مخول (@entityName)
 					</h4>
 				</div>
-				<div>
-					<span style="color:red;font-weight:800;">
-					</span>
-				</div>
+
 
 			</div>
 		}
-
-		@email
-		<br />
-		@entitycode
 
 	</Authorized>
 	<NotAuthorized>
@@ -63,6 +57,19 @@
 		</div>
 	</NotAuthorized>
 </AuthorizeView>
+<div style="direction:rtl;">
+	<span style="font-size:30px;color:red">التبليغات</span><br />
+	@foreach (var bdm in dbmessages)
+	{
+		<span style="font-size:24px;color:red;">@bdm.title</span>
+
+		<br />
+		<span style="font-size:20px;">@bdm.message</span><br />
+
+	}
+	<span style="color:red;font-weight:800;">
+	</span>
+</div>
 @code {
 
 	public string message = "";
@@ -71,7 +78,7 @@
 	string newUser = string.Empty;
 	string email = string.Empty;
 	int entitycode;
-
+	List<Dbmessage> dbmessages = new List<Dbmessage>();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -94,7 +101,11 @@
 				StateHasChanged();
 			}
 		}
-
+		var response = await AnnouncementService.GetActiveDbMessage();
+		if (response.Data != null)
+		{
+			dbmessages = response.Data;
+		}
 
 	}
 

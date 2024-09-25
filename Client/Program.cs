@@ -8,6 +8,7 @@ global using GzReservation.Client.Services.OracleService;
 global using GzReservation.Client.Services.ReservationService;
 global using GzReservation.Client.DTOs;
 global using GzReservation.Client.Services.MessageService;
+global using GzReservation.Client.Services.AnnouncementService;
 
 using GzReservation.Client;
 using Microsoft.AspNetCore.Components.Web;
@@ -25,6 +26,7 @@ builder.Services.AddScoped<ISecurityFormService, SecurityFormService>();
 builder.Services.AddScoped<IOracleService, OracleService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 

@@ -85,7 +85,7 @@ namespace GzReservation.Server.Services.ReservationService
                         .Where(r => r.action_date.Date == today && r.EntityId == reservationDto.EntityId && r.state == true)
                         .CountAsync();
 
-                    if (reservationCountPerToday >= (entity.max_day * 2))
+                    if (reservationCountPerToday >= (entity.max_day))
                     {
                         return new ServiceResponse<Reservation>
                         {
@@ -277,7 +277,7 @@ namespace GzReservation.Server.Services.ReservationService
                         .Where(r => r.action_date.Date == today && r.EntityId == reservationDto.EntityId && r.state == true)
                         .CountAsync();
 
-                    if (reservationCountPerToday >= (entity.max_day * 2))
+                    if (reservationCountPerToday >= (entity.max_day))
                     {
                         return new ServiceResponse<Reservation>
                         {

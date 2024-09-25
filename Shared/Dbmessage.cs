@@ -12,5 +12,6 @@ namespace GzReservation.Shared
         public string message { get; set; }
         public bool visible { get; set; }
         public string type { get; set; }
+        public string title { get; set; }
     }
 }
