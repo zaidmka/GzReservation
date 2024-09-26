@@ -423,7 +423,7 @@ namespace GzReservation.Server.Services.ReservationService
                     .CountAsync();
                 int entityDailyLimit = await _dataContext.entities.Where(r => r.id == entityId).Select(r=>r.max_day).FirstOrDefaultAsync();
 
-                return new ServiceResponse<int> { Data = (2*entityDailyLimit)-reservationCountToday, Message = "Okay", Success = true };
+                return new ServiceResponse<int> { Data = (entityDailyLimit)-reservationCountToday, Message = "Okay", Success = true };
             }
             catch (DbUpdateException ex)
             {
