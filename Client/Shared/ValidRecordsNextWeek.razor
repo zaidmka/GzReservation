@@ -252,13 +252,6 @@ else
 
 }
 
-<div id="printSection">
-	<h3>Reservation Details</h3>
-	<p><strong>Name:</strong> John Doe</p>
-	<p><strong>Reservation ID:</strong> ABC12345</p>
-	<p><strong>Reservation Date:</strong> 2024-12-10</p>
-</div>
-
 <button @onclick="PrintDiv">Print This Section</button>
 
 
@@ -296,15 +289,17 @@ else
 	private string dailyLimit = string.Empty;
 
 	//print test stuff
-	private string fullName = "John Doe";
-	private string reservationId = "ABC12345";
+	private string fullName = "بلاسم باقر خلف كرم الله الساعدي محمد محمد";
+	private string reservationId = "ABC12345 12";
 	private string reservationDate = "2024-12-10";
 
 
 	private async Task PrintDiv()
 	{
 		// Call the JavaScript function defined in print.js
-		await js.InvokeVoidAsync("printDiv", "printSection");
+		//await js.InvokeVoidAsync("printDiv", "printSection");
+		await js.InvokeVoidAsync("printDataToPrinter", fullName, reservationId, reservationDate);
+
 	}
 
 	async void GetDailyLimit()
@@ -461,14 +456,14 @@ else
 			if (result.Success)
 			{
 				// Example data for reservation
-				string fullName = "John Doe";
-				string reservationDate = "12/10/2024";
-				string reservationId = "12345";
-				string reservationHour = "10:00 AM";
+				string fullName = AddedReservation.full_name;
+				string reservationDate = AddedReservation.reservation_date.ToString();
+				string doc_no = AddedReservation.doc_no.ToString();
+				string reservationHour = AddedReservation.reservation_hour.ToString(); ;
 
 				// Call the JavaScript function to print reservation details
 				await js.InvokeVoidAsync("logMessageToConsole");
-				await js.InvokeVoidAsync("printDataToPrinter", "John Doe", "ABC12345", "2024-12-10");
+				await js.InvokeVoidAsync("printDataToPrinter", fullName, reservationDate, doc_no, reservationHour);
 
 
 
