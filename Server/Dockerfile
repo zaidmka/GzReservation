@@ -6,7 +6,7 @@ WORKDIR /src
 COPY . .
 
 # نشر المشروع
-RUN dotnet publish "GzReservation.csproj" -c Release -o /app/publish
+RUN dotnet publish "GzReservation.Server.csproj" -c Release -o /app/publish
 
 # ---------- Runtime Stage ----------
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
@@ -17,4 +17,4 @@ COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:80
 EXPOSE 80
 
-ENTRYPOINT ["dotnet", "GzReservation.dll"]
+ENTRYPOINT ["dotnet", "GzReservation.Server.dll"]
