@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: gzreservation-app
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: Server
+    envVars:
+      - key: ConnectionStrings__Default
+        value: YOUR_POSTGRES_CONNECTION_STRING
