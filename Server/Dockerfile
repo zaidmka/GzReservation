@@ -1,22 +1,24 @@
-﻿buildCommand: echo "Building from Dockerfile inside Server"
-startCommand: ""
-
-# ---------- Build Stage ----------
+﻿# ---------- Build Stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
+WORKDIR /app
 
-# انسخ الكود
+# انسخ فقط الملفات الخاصة بالمشروع داخل مجلد Server
+COPY Server/*.csproj ./Server/
+COPY Shared/*.csproj ./Shared/
+COPY Client/*.csproj ./Client/
+
+# انسخ كل المشروع
 COPY . .
 
-# نشر المشروع
-RUN dotnet publish "GzReservation.Server.csproj" -c Release -o /app/publish
+# انشر السيرفر
+WORKDIR /app/Server
+RUN dotnet publish GzReservation.Server.csproj -c Release -o /app/publish
 
 # ---------- Runtime Stage ----------
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# إعداد الخادم
 ENV ASPNETCORE_URLS=http://+:80
 EXPOSE 80
 
