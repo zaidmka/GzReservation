@@ -28,14 +28,19 @@ using AspNetCoreRateLimit;
 using System;
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 //use the .env
+builder.Configuration.AddEnvironmentVariables();
+
 var connectionString = builder.Configuration["POSTGRES_CONNECTION"];
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(connectionString));
+
+Console.WriteLine(" From .env: " + connectionString);
 
 //builder.Services.AddDbContext<DataContext>(options =>
 //{ 
