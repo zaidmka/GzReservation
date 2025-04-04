@@ -113,7 +113,10 @@ app.Use(async (context, next) =>
     await next();
 });
 
-
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
