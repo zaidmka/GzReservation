@@ -25,13 +25,23 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using AspNetCoreRateLimit;
+using System;
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
+//use the .env
+var connectionString = builder.Configuration["POSTGRES_CONNECTION"];
 builder.Services.AddDbContext<DataContext>(options =>
-{ options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); });
+    options.UseNpgsql(connectionString));
+
+//builder.Services.AddDbContext<DataContext>(options =>
+//{ 
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); 
+
+//});
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
