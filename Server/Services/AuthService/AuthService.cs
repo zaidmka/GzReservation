@@ -123,23 +123,22 @@ namespace GzReservation.Server.Services.AuthService
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using (var hmac = new HMACSHA512())
+            using (var hmac = new Rfc2898DeriveBytes(password, 16, 100_000, HashAlgorithmName.SHA256))
             {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac
-                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordSalt = hmac.Salt;
+                passwordHash = hmac.GetBytes(32); // 256-bit
+            }
+        }
 
-            }
-        }
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
         {
-            using (var hmac = new HMACSHA512(passwordSalt))
+            using (var hmac = new Rfc2898DeriveBytes(password, storedSalt, 100_000, HashAlgorithmName.SHA256))
             {
-                var computedHash =
-                    hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
+                var computedHash = hmac.GetBytes(32);
+                return computedHash.SequenceEqual(storedHash);
             }
         }
+
 
         private string CreateToken(UserEntity user)
         {
