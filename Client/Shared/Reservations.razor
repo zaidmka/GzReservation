@@ -21,7 +21,7 @@ else
 
     <div class="center-div">
         <h3>
-            حجز الموعد
+            حجز الموعد بالجهة
             (@entityName)
         </h3>
 
@@ -37,30 +37,28 @@ else
         </h4>
     </div>
     <br />
-    <div class="custom-table">
-        <MudTable T="Reservation" Items="@ReservationDba" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+    <div class="">
+        <MudTable T="Reservation" Items="@ReservationDba" Hover="true" Breakpoint="Breakpoint.None" @ref="mudTable"
                   RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent" Bordered="true" Striped="true" FixedHeader="true" HeaderClass="testheader">
             <HeaderContent>
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">التسلسل</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:14px;">ت</MudTh>
 
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">الاسم الكامل</MudTh>
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">اسم الأم</MudTh>
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رقم الحفظ</MudTh>
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">تاريخ الحجز</MudTh>
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">ساعة الحجز</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:14px;">الاسم الكامل</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:14px;">رقم الحفظ</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:14px;">تاريخ الحجز</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:14px;">ساعة الحجز</MudTh>
 
-                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:18px;">رمز الجهة</MudTh>
+                <MudTh Style="background-color:rebeccapurple;color:white;font-weight:600;text-align:center;font-size:14px;">رمز الجهة</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Nr">@(ReservationDba.IndexOf(context) + 1)</MudTd>
+                <MudTd DataLabel="تسلسل">@(ReservationDba.IndexOf(context) + 1)</MudTd>
 
-                    <MudTd Style="font-weight:600" DataLabel="Nr">@context.full_name</MudTd>
-                    <MudTd Style="font-weight:600" DataLabel="Sign">@context.mother_name</MudTd>
-                    <MudTd Style="font-weight:600" DataLabel="Name">@context.doc_no</MudTd>
-                    <MudTd Style="font-weight:600" DataLabel="Position">@context.reservation_date</MudTd>
-                    <MudTd Style="font-weight:600" DataLabel="Position">@context.reservation_hour</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="الاسم الكامل">@context.full_name</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="رقم الحفظ">@context.doc_no</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="تاريخ الحجز">@context.reservation_date</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="ساعة الحجز">@context.reservation_hour</MudTd>
 
-                    <MudTd Style="font-weight:600" DataLabel="Position">@context.EntityId</MudTd>
+                    <MudTd Style="font-weight:600" DataLabel="رمز الجهة">@context.EntityId</MudTd>
                 </RowTemplate>
             </MudTable>
         </div>
